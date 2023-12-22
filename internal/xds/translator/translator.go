@@ -19,7 +19,6 @@ import (
 	endpointv3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listenerv3 "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	routev3 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
-	tlsv3 "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 	matcherv3 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	resourcev3 "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/tetratelabs/multierror"
@@ -268,7 +267,7 @@ func (t *Translator) processHTTPListenerXdsTranslation(
 				if err := addXdsCluster(tCtx, &xdsClusterArgs{
 					name:          httpRoute.Destination.Name,
 					settings:      httpRoute.Destination.Settings,
-					tSocket:      tsocket,
+					tSocket:       tsocket,
 					endpointType:  EndpointTypeStatic,
 					loadBalancer:  httpRoute.LoadBalancer,
 					proxyProtocol: httpRoute.ProxyProtocol,
@@ -535,16 +534,6 @@ func addXdsCluster(tCtx *types.ResourceVersionTable, args *xdsClusterArgs) error
 	}
 	return nil
 }
-
-type xdsClusterArgs struct {
-	name         string
-	settings     []*ir.DestinationSetting
-	tSocket      *corev3.TransportSocket
-	endpointType EndpointType
-	loadBalancer *ir.LoadBalancer
-}
-
-type EndpointType int
 
 const (
 	DefaultEndpointType EndpointType = iota

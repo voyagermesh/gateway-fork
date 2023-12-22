@@ -164,6 +164,11 @@ func (r *Runner) subscribeAndTranslate(ctx context.Context) {
 				key := utils.NamespacedName(securityPolicy)
 				r.ProviderResources.SecurityPolicyStatuses.Store(key, &securityPolicy.Status)
 			}
+			for _, backendTlsPolicy := range result.BackendTLSPolicies {
+				backendTlsPolicy := backendTlsPolicy
+				key := utils.NamespacedName(backendTlsPolicy)
+				r.ProviderResources.BackendTLSPolicyStatuses.Store(key, &backendTlsPolicy.Status)
+			}
 		},
 	)
 	r.Logger.Info("shutting down")
