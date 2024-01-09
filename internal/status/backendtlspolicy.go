@@ -13,16 +13,16 @@ func SetBackendTLSPolicyCondition(c *gwv1a2.BackendTLSPolicy, policyAnces gwv1a2
 		fmt.Println(ancestor.AncestorRef)
 		fmt.Println("*****************------------------")
 		fmt.Println(policyAnces.AncestorRef)
-		if ancestor.AncestorRef == policyAnces.AncestorRef {
-			c.Status.Ancestors[i].Conditions = MergeConditions(c.Status.Ancestors[i].Conditions, cond)
-			return
-		}
-		//if ancestor.AncestorRef.Name == policyAnces.AncestorRef.Name &&
-		//	(ancestor.AncestorRef.Namespace == nil || *ancestor.AncestorRef.Namespace == *policyAnces.AncestorRef.Namespace) &&
-		//	(ancestor.AncestorRef.SectionName == nil || *ancestor.AncestorRef.SectionName == *policyAnces.AncestorRef.SectionName) {
+		//if ancestor.AncestorRef == policyAnces.AncestorRef {
 		//	c.Status.Ancestors[i].Conditions = MergeConditions(c.Status.Ancestors[i].Conditions, cond)
 		//	return
 		//}
+		if ancestor.AncestorRef.Name == policyAnces.AncestorRef.Name &&
+			(ancestor.AncestorRef.Namespace == nil || *ancestor.AncestorRef.Namespace == *policyAnces.AncestorRef.Namespace) { //&&
+			//(ancestor.AncestorRef.SectionName == nil || *ancestor.AncestorRef.SectionName == *policyAnces.AncestorRef.SectionName) {
+			c.Status.Ancestors[i].Conditions = MergeConditions(c.Status.Ancestors[i].Conditions, cond)
+			return
+		}
 	}
 	len := len(c.Status.Ancestors)
 	c.Status.Ancestors = append(c.Status.Ancestors, policyAnces)

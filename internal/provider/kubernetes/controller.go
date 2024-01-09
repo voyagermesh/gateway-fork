@@ -337,7 +337,7 @@ func (r *gatewayAPIReconciler) Reconcile(ctx context.Context, _ reconcile.Reques
 		policy := policy
 		// Discard Status to reduce memory consumption in watchable
 		// It will be recomputed by the gateway-api layer
-		policy.Status = gwapiv1a2.PolicyStatus{}
+		policy.Status = gwapiv1a2.PolicyStatus{} // todo ?
 		resourceTree.BackendTLSPolicies = append(resourceTree.BackendTLSPolicies, &policy)
 	}
 
@@ -1685,7 +1685,7 @@ func (r *gatewayAPIReconciler) watchResources(ctx context.Context, mgr manager.M
 		return err
 	}
 
-	// Watch SecurityPolicy
+	// Watch BackendTLSPolicy
 	btlsPredicates := []predicate.Predicate{predicate.GenerationChangedPredicate{}}
 	if len(r.namespaceLabels) != 0 {
 		btlsPredicates = append(btlsPredicates, predicate.NewPredicateFuncs(r.hasMatchingNamespaceLabels))
