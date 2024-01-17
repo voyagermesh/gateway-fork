@@ -197,7 +197,7 @@ func (t *Translator) Translate(resources *Resources) *TranslateResult {
 		resources.SecurityPolicies, gateways, routes, resources, xdsIR)
 
 	backendTlsPolicies := t.ProcessBackendTLSPolicies(
-		resources.BackendTLSPolicies, gateways, routes, xdsIR)
+		resources.BackendTLSPolicies, gateways)
 
 	// Sort xdsIR based on the Gateway API spec
 	sortXdsIRMap(xdsIR)

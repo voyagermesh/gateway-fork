@@ -613,12 +613,13 @@ func (r *gatewayAPIReconciler) ProcessBackendTLS(ctx context.Context, targetBack
 	}
 
 	if valid {
-		for _, btls := range resTree.BackendTLSPolicies {
-			if btls.Name == bacTLSPolicy.Name && btls.Namespace == btls.Namespace {
-				return nil
-			}
-		}
-		//resTree.BackendTLSPolicies = append(resTree.BackendTLSPolicies, bacTLSPolicy)
+		//for _, btls := range resTree.BackendTLSPolicies {
+		//	if btls.Name == bacTLSPolicy.Name && btls.Namespace == btls.Namespace {
+		//		return nil
+		//	}
+		//}
+		//resTree.BackendTLSPolicies = append(resTree.BackendTLSPolicies, bacTLSPolicy) // avoid pushing resource again in the resource tree , it has been pushed in internal/provider/kubernetes/controller.go 341
+
 		for _, caRef := range bacTLSPolicy.Spec.TLS.CACertRefs {
 			key := client.ObjectKey{
 				Namespace: bacTLSPolicy.Namespace,
@@ -629,12 +630,14 @@ func (r *gatewayAPIReconciler) ProcessBackendTLS(ctx context.Context, targetBack
 				if err := r.client.Get(ctx, key, secret); err != nil {
 					return err
 				}
+				// TODO check for the secret exist ?
 				resTree.Secrets = append(resTree.Secrets, secret)
 			} else {
 				cmap := &corev1.ConfigMap{}
 				if err := r.client.Get(ctx, key, cmap); err != nil {
 					return err
 				}
+				// TODO check for the configmap exist ?
 				resTree.ConfigMaps = append(resTree.ConfigMaps, cmap)
 			}
 		}
