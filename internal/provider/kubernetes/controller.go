@@ -327,6 +327,20 @@ func (r *gatewayAPIReconciler) Reconcile(ctx context.Context, _ reconcile.Reques
 	// Add the referenced Secrets in SecurityPolicies to the resourceTree
 	r.processSecurityPolicySecretRefs(ctx, resourceTree, resourceMap)
 
+	// Add all BackendTLSPolies
+	backendTlsPolicies := gwapiv1a2.BackendTLSPolicyList{}
+	if err := r.client.List(ctx, &backendTlsPolicies); err != nil {
+		return reconcile.Result{}, fmt.Errorf("error listing BackendTLSPolicies: %v", err)
+	}
+
+	for _, policy := range backendTlsPolicies.Items {
+		policy := policy
+		// Discard Status to reduce memory consumption in watchable
+		// It will be recomputed by the gateway-api layer
+		policy.Status = gwapiv1a2.PolicyStatus{} // todo ?
+		resourceTree.BackendTLSPolicies = append(resourceTree.BackendTLSPolicies, &policy)
+	}
+
 	// For this particular Gateway, and all associated objects, check whether the
 	// namespace exists. Add to the resourceTree.
 	for ns := range resourceMap.allAssociatedNamespaces {
@@ -1345,6 +1359,36 @@ func (r *gatewayAPIReconciler) subscribeAndUpdateStatus(ctx context.Context) {
 		)
 		r.log.Info("securityPolicy status subscriber shutting down")
 	}()
+
+	// BackendTLSPolicy object status updater
+	go func() {
+		message.HandleSubscription(message.Metadata{Runner: string(v1alpha1.LogComponentProviderRunner), Message: "backendtlspolicy-status"}, r.resources.BackendTLSPolicyStatuses.Subscribe(ctx),
+			func(update message.Update[types.NamespacedName, *gwapiv1a2.PolicyStatus], errChan chan error) {
+				// skip delete updates.
+				if update.Delete {
+					return
+				}
+				key := update.Key
+				val := update.Value
+				r.statusUpdater.Send(status.Update{
+					NamespacedName: key,
+					Resource:       new(gwapiv1a2.BackendTLSPolicy),
+					Mutator: status.MutatorFunc(func(obj client.Object) client.Object {
+						t, ok := obj.(*gwapiv1a2.BackendTLSPolicy)
+						if !ok {
+							err := fmt.Errorf("unsupported object type %T", obj)
+							errChan <- err
+							panic(err)
+						}
+						tCopy := t.DeepCopy()
+						tCopy.Status = *val
+						return tCopy
+					}),
+				})
+			},
+		)
+		r.log.Info("backendTlsPolicy status subscriber shutting down")
+	}()
 }
 
 // watchResources watches gateway api resources.
@@ -1637,6 +1681,20 @@ func (r *gatewayAPIReconciler) watchResources(ctx context.Context, mgr manager.M
 		source.Kind(mgr.GetCache(), &v1alpha1.SecurityPolicy{}),
 		handler.EnqueueRequestsFromMapFunc(r.enqueueClass),
 		spPredicates...,
+	); err != nil {
+		return err
+	}
+
+	// Watch BackendTLSPolicy
+	btlsPredicates := []predicate.Predicate{predicate.GenerationChangedPredicate{}}
+	if len(r.namespaceLabels) != 0 {
+		btlsPredicates = append(btlsPredicates, predicate.NewPredicateFuncs(r.hasMatchingNamespaceLabels))
+	}
+
+	if err := c.Watch(
+		source.Kind(mgr.GetCache(), &gwapiv1a2.BackendTLSPolicy{}),
+		handler.EnqueueRequestsFromMapFunc(r.enqueueClass),
+		btlsPredicates...,
 	); err != nil {
 		return err
 	}

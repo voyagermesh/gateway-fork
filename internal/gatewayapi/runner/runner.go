@@ -7,6 +7,7 @@ package runner
 
 import (
 	"context"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -163,6 +164,12 @@ func (r *Runner) subscribeAndTranslate(ctx context.Context) {
 				securityPolicy := securityPolicy
 				key := utils.NamespacedName(securityPolicy)
 				r.ProviderResources.SecurityPolicyStatuses.Store(key, &securityPolicy.Status)
+			}
+			for _, backendTlsPolicy := range result.BackendTLSPolicies {
+				backendTlsPolicy := backendTlsPolicy
+				key := utils.NamespacedName(backendTlsPolicy)
+				fmt.Println("\n flag 4 *******************************************************************")
+				r.ProviderResources.BackendTLSPolicyStatuses.Store(key, &backendTlsPolicy.Status)
 			}
 		},
 	)
