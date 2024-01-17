@@ -7,6 +7,7 @@ package gatewayapi
 
 import (
 	"fmt"
+	"github.com/envoyproxy/gateway/internal/status"
 	"strconv"
 	"strings"
 	"time"
@@ -166,7 +167,31 @@ func (t *Translator) processHTTPRouteRules(httpRoute *HTTPRouteContext, parentRe
 						route.BackendWeights.Valid += backendWeight
 						route.BackendTLS = func() *ir.TLSBundle {
 							targetBackend := GetTargetBackendReference(backendRef.BackendRef, NamespaceDerefOr(NamespacePtr(httpRoute.Namespace), "default"))
-							return getBackendTLSBundle(resources.BackendTLSPolicies, resources.ConfigMaps, resources.Secrets, targetBackend)
+							err, tlsBundle := getBackendTLSBundle(resources.BackendTLSPolicies, resources.ConfigMaps, resources.Secrets, targetBackend)
+							if err == nil && tlsBundle == nil {
+								return nil
+							}
+							policy := getBackendTLSPolicy(resources.BackendTLSPolicies, targetBackend)
+							ancestor := gwapiv1a1.PolicyAncestorStatus{
+								AncestorRef: gwapiv1a1.ParentReference{
+									Group:       parentRef.Group,
+									Kind:        parentRef.Kind,
+									Namespace:   parentRef.Namespace,
+									Name:        parentRef.Name,
+									SectionName: parentRef.SectionName,
+									Port:        parentRef.Port,
+								},
+								ControllerName: gwapiv1.GatewayController(httpRoute.GatewayControllerName),
+							}
+							if err != nil {
+								messeg := err.Error()
+								status.SetBackendTLSPolicyCondition(policy, ancestor, gwapiv1a1.PolicyConditionAccepted, metav1.ConditionUnknown, gwapiv1a1.PolicyReasonInvalid, messeg)
+								return nil
+							} else {
+								fmt.Println("\n flag 3 *******************************************************************")
+								status.SetBackendTLSPolicyCondition(policy, ancestor, gwapiv1a1.PolicyConditionAccepted, metav1.ConditionUnknown, gwapiv1a1.PolicyReasonAccepted, "BackendTLSPolicy is Accepted")
+								return tlsBundle
+							}
 						}()
 					} else {
 						route.BackendWeights.Invalid += backendWeight
@@ -1204,12 +1229,12 @@ func getBackendTLSPolicy(policies []*gwapiv1a1.BackendTLSPolicy, target gwapiv1a
 	return nil
 }
 
-func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*corev1.ConfigMap, secrets []*corev1.Secret, targetBackend gwapiv1a1.PolicyTargetReferenceWithSectionName) *ir.TLSBundle {
+func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*corev1.ConfigMap, secrets []*corev1.Secret, targetBackend gwapiv1a1.PolicyTargetReferenceWithSectionName) (error, *ir.TLSBundle) {
 
 	backendTLSPolicy := getBackendTLSPolicy(policies, targetBackend)
 
 	if backendTLSPolicy == nil {
-		return nil
+		return nil, nil
 	}
 
 	tlsBundle := &ir.TLSBundle{}
@@ -1229,6 +1254,8 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 					ca += "\n"
 				}
 				ca += crt
+			} else {
+				return fmt.Errorf("no ca found in configmap %s", cmap.Name), nil
 			}
 		}
 	}
@@ -1245,9 +1272,15 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 				if key, keyOk := secret.Data["tls.key"]; keyOk {
 					tlsBundle.CertificateByte = tls
 					tlsBundle.PrivateKeyByte = key
+				} else {
+					return fmt.Errorf("no tls key found in secret %s", secret.Name), nil
 				}
 			}
 		}
+	}
+
+	if ca == "" {
+		return fmt.Errorf("no ca found in referred configmaps of secrets"), nil
 	}
 
 	tlsBundle.CaCertificate = []byte(ca)
@@ -1256,5 +1289,5 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 
 	tlsBundle.Hostname = string(backendTLSPolicy.Spec.TLS.Hostname)
 
-	return tlsBundle
+	return nil, tlsBundle
 }
