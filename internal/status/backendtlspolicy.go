@@ -8,6 +8,14 @@ import (
 )
 
 func SetBackendTLSPolicyCondition(c *gwv1a2.BackendTLSPolicy, policyAnces gwv1a2.PolicyAncestorStatus, conditionType gwv1a2.PolicyConditionType, status metav1.ConditionStatus, reason gwv1a2.PolicyConditionReason, message string) {
+
+	if &c.Status == nil {
+		c.Status = gwv1a2.PolicyStatus{}
+	}
+	if c.Status.Ancestors == nil {
+		c.Status.Ancestors = []gwv1a2.PolicyAncestorStatus{}
+	}
+
 	cond := newCondition(string(conditionType), status, string(reason), message, time.Now(), c.Generation)
 	for i, ancestor := range c.Status.Ancestors {
 		fmt.Println(ancestor.AncestorRef)

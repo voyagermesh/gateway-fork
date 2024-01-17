@@ -618,7 +618,7 @@ func (r *gatewayAPIReconciler) ProcessBackendTLS(ctx context.Context, targetBack
 				return nil
 			}
 		}
-		resTree.BackendTLSPolicies = append(resTree.BackendTLSPolicies, bacTLSPolicy)
+		//resTree.BackendTLSPolicies = append(resTree.BackendTLSPolicies, bacTLSPolicy)
 		for _, caRef := range bacTLSPolicy.Spec.TLS.CACertRefs {
 			key := client.ObjectKey{
 				Namespace: bacTLSPolicy.Namespace,
