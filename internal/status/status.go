@@ -15,7 +15,6 @@ package status
 
 import (
 	"context"
-
 	"github.com/go-logr/logr"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -170,6 +169,7 @@ func (u *UpdateWriter) Send(update Update) {
 //	EnvoyPatchPolicy
 //	ClientTrafficPolicy
 //	SecurityPolicy
+//	BackendTLSPolicy
 func isStatusEqual(objA, objB interface{}) bool {
 	opts := cmpopts.IgnoreFields(metav1.Condition{}, "LastTransitionTime")
 	switch a := objA.(type) {
@@ -235,6 +235,12 @@ func isStatusEqual(objA, objB interface{}) bool {
 		}
 	case *egv1a1.SecurityPolicy:
 		if b, ok := objB.(*egv1a1.SecurityPolicy); ok {
+			if cmp.Equal(a.Status, b.Status, opts) {
+				return true
+			}
+		}
+	case gwapiv1a2.BackendTLSPolicy:
+		if b, ok := objB.(*gwapiv1a2.BackendTLSPolicy); ok {
 			if cmp.Equal(a.Status, b.Status, opts) {
 				return true
 			}

@@ -8,6 +8,7 @@ package gatewayapi
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	gwapiv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 
 	egv1a1 "github.com/envoyproxy/gateway/api/v1alpha1"
 	"github.com/envoyproxy/gateway/internal/ir"
@@ -101,6 +102,7 @@ func newTranslateResult(gateways []*GatewayContext,
 	clientTrafficPolicies []*egv1a1.ClientTrafficPolicy,
 	backendTrafficPolicies []*egv1a1.BackendTrafficPolicy,
 	securityPolicies []*egv1a1.SecurityPolicy,
+	backendTlsPolicies []*v1alpha2.BackendTLSPolicy,
 	xdsIR XdsIRMap, infraIR InfraIRMap) *TranslateResult {
 	translateResult := &TranslateResult{
 		XdsIR:   xdsIR,
@@ -129,6 +131,7 @@ func newTranslateResult(gateways []*GatewayContext,
 	translateResult.ClientTrafficPolicies = append(translateResult.ClientTrafficPolicies, clientTrafficPolicies...)
 	translateResult.BackendTrafficPolicies = append(translateResult.BackendTrafficPolicies, backendTrafficPolicies...)
 	translateResult.SecurityPolicies = append(translateResult.SecurityPolicies, securityPolicies...)
+	translateResult.BackendTLSPolicies = append(translateResult.BackendTLSPolicies, backendTlsPolicies...)
 
 	return translateResult
 }
@@ -193,12 +196,15 @@ func (t *Translator) Translate(resources *Resources) *TranslateResult {
 	securityPolicies := t.ProcessSecurityPolicies(
 		resources.SecurityPolicies, gateways, routes, resources, xdsIR)
 
+	backendTlsPolicies := t.ProcessBackendTLSPolicies(
+		resources.BackendTLSPolicies, gateways)
+
 	// Sort xdsIR based on the Gateway API spec
 	sortXdsIRMap(xdsIR)
 
 	return newTranslateResult(gateways, httpRoutes, grpcRoutes, tlsRoutes,
 		tcpRoutes, udpRoutes, clientTrafficPolicies, backendTrafficPolicies,
-		securityPolicies, xdsIR, infraIR)
+		securityPolicies, backendTlsPolicies, xdsIR, infraIR)
 
 }
 
