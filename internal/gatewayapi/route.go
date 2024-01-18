@@ -1261,12 +1261,6 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 
 	for _, secret := range secrets {
 		if kind, ok := caRefMap[secret.Name]; ok && kind == secret.Kind {
-			if crt, dataOk := secret.Data["ca.crt"]; dataOk {
-				if ca != "" {
-					ca += "\n"
-				}
-				ca += string(crt)
-			}
 			if tls, tlsOk := secret.Data["tls.crt"]; tlsOk {
 				if key, keyOk := secret.Data["tls.key"]; keyOk {
 					tlsBundle.CertificateByte = tls
@@ -1279,7 +1273,7 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 	}
 
 	if ca == "" {
-		return fmt.Errorf("no ca found in referred configmaps of secrets"), nil
+		return fmt.Errorf("no ca found in referred configmaps"), nil
 	}
 
 	tlsBundle.CaCertificate = []byte(ca)
