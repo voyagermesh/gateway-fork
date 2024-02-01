@@ -61,6 +61,33 @@ func TestTranslate(t *testing.T) {
 				GlobalRateLimitEnabled: true,
 			}
 
+			//gg := &v1.Gateway{
+			//	TypeMeta: metav1.TypeMeta{
+			//		Kind: "Gateway", APIVersion: "gateway.networking.k8s.io/v1",
+			//	},
+			//	ObjectMeta: metav1.ObjectMeta{
+			//		Name: "btls-gateway", Namespace: "envoy-gateway",
+			//	},
+			//	Spec: v1.GatewaySpec{
+			//		GatewayClassName: "envoy-gateway-class",
+			//		Listeners: []v1beta1.Listener{
+			//			{
+			//				Name:     "http",
+			//				Protocol: "HTTP",
+			//				Port:     80,
+			//				AllowedRoutes: &v1beta1.AllowedRoutes{
+			//					Namespaces: &v1.RouteNamespaces{
+			//						From: ptr.To(v1.NamespacesFromAll),
+			//					},
+			//				},
+			//			},
+			//		},
+			//	},
+			//	Status: v1.GatewayStatus{},
+			//}
+			//
+			//resources.Gateways = append(resources.Gateways, gg)
+
 			// Add common test fixtures
 			for i := 1; i <= 3; i++ {
 				svcName := "service-" + strconv.Itoa(i)
