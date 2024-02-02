@@ -1,6 +1,7 @@
 package gatewayapi
 
 import (
+	"fmt"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
@@ -18,16 +19,27 @@ func (t *Translator) ProcessBackendTLSPolicies(backendTlsPolicies []*v1alpha2.Ba
 				exist := false
 				for _, gwContext := range gateways {
 					gw := gwContext.Gateway
+					if gw == nil {
+						continue
+					}
 					if gw.Name == string(status.AncestorRef.Name) && gw.Namespace == string(NamespaceDerefOrAlpha(status.AncestorRef.Namespace, "default")) {
+						//if gw.Spec.Listeners == nil {
+						//	continue
+						//}
 						for _, lis := range gw.Spec.Listeners {
-							if lis.Name == *status.AncestorRef.SectionName {
+							fmt.Println(status.AncestorRef)
+							if status.AncestorRef.SectionName != nil {
+								fmt.Println(status.AncestorRef.SectionName)
+							}
+							fmt.Println(lis.Name)
+							if status.AncestorRef.SectionName != nil && lis.Name == *status.AncestorRef.SectionName {
 								exist = true
 							}
 						}
 					}
 				}
 
-				if !exist {
+				if !exist && len(policy.Status.Ancestors) != 0 {
 					policy.Status.Ancestors = append(policy.Status.Ancestors[:k], policy.Status.Ancestors[k+1:]...)
 				}
 			}

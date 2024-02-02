@@ -35,6 +35,7 @@ httpRoutes:
       parentRefs:
         - namespace: envoy-gateway
           name: btls-gateway
+          sectionName: http
       rules:
         - matches:
             - path:
@@ -42,14 +43,14 @@ httpRoutes:
                 value: "/exact"
           backendRefs:
             - name: btls-service
-              namespace: backends
+              namespace: backend
               port: 8080
               
 services:
   - apiVersion: v1
     kind: Service
     metadata:
-      namespace: backends
+      namespace: backend
       name: btls-service
     spec:
       clusterIP: 1.1.1.1
@@ -64,7 +65,7 @@ endpointSlices:
     kind: EndpointSlice
     metadata:
       name: endpointslice-btls-service
-      namespace: backends
+      namespace: backend
       labels:
         kubernetes.io/service-name: btls-service
     addressType: IPv4
@@ -82,13 +83,13 @@ referenceGrants:
   - apiVersion: gateway.networking.k8s.io/v1alpha2
     kind: ReferenceGrant
     metadata:
-      namespace: backends
+      namespace: backend
       name: btls-referencegrant
     spec:
       from:
         - group: gateway.networking.k8s.io
           kind: HTTPRoute
-          namespace: default
+          namespace: envoy-gateway
       to:
         - group: ""
           kind: Service
@@ -97,7 +98,7 @@ secrets:
     kind: Secret
     metadata:
       namespace: envoy-gateway
-      name: btls-tls-secret
+      name: btls-secret
     type: kubernetes.io/tls
     data:
       tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJHekNCd2dJSkFJL3gxc0NEL0lSa01Bb0dDQ3FHU000OUJBTUNNQll4RkRBU0JnTlZCQU1NQzJadmJ5NWkKWVhJdVkyOXRNQjRYRFRJek1ERXdOVEl4TlRNeU9Wb1hEVEkwTURFd05USXhOVE15T1Zvd0ZqRVVNQklHQTFVRQpBd3dMWm05dkxtSmhjaTVqYjIwd1dUQVRCZ2NxaGtqT1BRSUJCZ2dxaGtqT1BRTUJCd05DQUFRZmxXMnR6T3M4Cm82Nk5USVRmYUhucEc2UzI3Y2hkSldzallKdWJISkFtT2tYdS8rVGxLTXhGUzl4R2tHK09BQjAyR0ZQaHhQVzcKRnFaTFJoOEp0YlZkTUFvR0NDcUdTTTQ5QkFNQ0EwZ0FNRVVDSVFEdlplU1pBZ1VWV2VpM3o0ZEhOTEd0aHpiaQoxRHZ0anRQekhYZ1R3WS92YmdJZ05KWStNcTRweFJnNit3eU04R1R4czVUV3k5Zml5RGhMUEU5QnhlbEsxSjQ9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
@@ -132,7 +133,7 @@ configMaps:
         3eXE6nt0YkgtDxG22KqnhpAg9gUSs2hlhoxyvkzyF0mu6NhPlwAgnq7+/Q==
         -----END CERTIFICATE-----
 
-backendTLSPolicy:
+backendTLSPolicies:
   - apiVersion: gateway.networking.k8s.io/v1alpha2
     kind: BackendTLSPolicy
     metadata:
@@ -150,7 +151,7 @@ backendTLSPolicy:
           - name: btls-configmap
             group: ''
             kind: ConfigMap
-          - name: btls-tls-secret
+          - name: btls-secret
             group: ''
             kind: Secret
         hostname: example.com
