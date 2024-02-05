@@ -1,0 +1,687 @@
+gateways:
+  - apiVersion: gateway.networking.k8s.io/v1
+    kind: Gateway
+    metadata:
+      name: gateway-btls-1
+      namespace: gateways
+    spec:
+      gatewayClassName: envoy-gateway-class
+      listeners:
+        - allowedRoutes:
+            namespaces:
+              from: All
+          name: http
+          port: 80
+          protocol: HTTP
+    status:
+      listeners:
+        - attachedRoutes: 1
+          conditions:
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Sending translated listener configuration to the data plane
+              observedGeneration: 0
+              reason: Programmed
+              status: "True"
+              type: Programmed
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Listener has been successfully translated
+              observedGeneration: 0
+              reason: Accepted
+              status: "True"
+              type: Accepted
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Listener references have been resolved
+              observedGeneration: 0
+              reason: ResolvedRefs
+              status: "True"
+              type: ResolvedRefs
+          name: http
+          supportedKinds:
+            - group: gateway.networking.k8s.io
+              kind: HTTPRoute
+            - group: gateway.networking.k8s.io
+              kind: GRPCRoute
+  - apiVersion: gateway.networking.k8s.io/v1
+    kind: Gateway
+    metadata:
+      name: gateway-btls-2
+      namespace: gateways
+    spec:
+      gatewayClassName: envoy-gateway-class
+      listeners:
+        - allowedRoutes:
+            namespaces:
+              from: All
+          name: http
+          port: 80
+          protocol: HTTP
+    status:
+      listeners:
+        - attachedRoutes: 1
+          conditions:
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Sending translated listener configuration to the data plane
+              observedGeneration: 1
+              reason: Programmed
+              status: "True"
+              type: Programmed
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Listener has been successfully translated
+              observedGeneration: 1
+              reason: Accepted
+              status: "True"
+              type: Accepted
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Listener references have been resolved
+              observedGeneration: 1
+              reason: ResolvedRefs
+              status: "True"
+              type: ResolvedRefs
+          name: http
+          supportedKinds:
+            - group: gateway.networking.k8s.io
+              kind: HTTPRoute
+            - group: gateway.networking.k8s.io
+              kind: GRPCRoute
+  - apiVersion: gateway.networking.k8s.io/v1
+    kind: Gateway
+    metadata:
+      name: gateway-btls-3
+      namespace: gateways
+    spec:
+      gatewayClassName: envoy-gateway-class
+      listeners:
+        - allowedRoutes:
+            namespaces:
+              from: All
+          name: http
+          port: 80
+          protocol: HTTP
+    status:
+      listeners:
+        - attachedRoutes: 1
+          conditions:
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Sending translated listener configuration to the data plane
+              observedGeneration: 1
+              reason: Programmed
+              status: "True"
+              type: Programmed
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Listener has been successfully translated
+              observedGeneration: 1
+              reason: Accepted
+              status: "True"
+              type: Accepted
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Listener references have been resolved
+              observedGeneration: 1
+              reason: ResolvedRefs
+              status: "True"
+              type: ResolvedRefs
+          name: http
+          supportedKinds:
+            - group: gateway.networking.k8s.io
+              kind: HTTPRoute
+            - group: gateway.networking.k8s.io
+              kind: GRPCRoute
+
+httpRoutes:
+  - apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/last-applied-configuration: |
+          {"apiVersion":"gateway.networking.k8s.io/v1","kind":"HTTPRoute","metadata":{"annotations":{},"name":"httproute-btls-1","namespace":"routes"},"spec":{"parentRefs":[{"name":"gateway-btls-1","namespace":"gateways","sectionName":"http"}],"rules":[{"backendRefs":[{"name":"http-backend-1","namespace":"backends","port":8080}]}]}}
+      creationTimestamp: "2024-02-05T09:28:37Z"
+      generation: 1
+      name: httproute-btls-1
+      namespace: routes
+      resourceVersion: "1537"
+      uid: 902faff3-9a80-42e5-9e23-866b8f3038c3
+    spec:
+      parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: gateway-btls-1
+          namespace: gateways
+          sectionName: http
+      rules:
+        - backendRefs:
+            - group: ""
+              kind: Service
+              name: http-backend-1
+              namespace: backends
+              port: 8080
+              weight: 1
+          matches:
+            - path:
+                type: PathPrefix
+                value: /
+    status:
+      parents:
+        - conditions:
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Route is accepted
+              observedGeneration: 1
+              reason: Accepted
+              status: "True"
+              type: Accepted
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Resolved all the Object references for the Route
+              observedGeneration: 1
+              reason: ResolvedRefs
+              status: "True"
+              type: ResolvedRefs
+          controllerName: gateway.envoyproxy.io/gatewayclass-controller
+          parentRef:
+            group: gateway.networking.k8s.io
+            kind: Gateway
+            name: gateway-btls-1
+            namespace: gateways
+            sectionName: http
+  - apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/last-applied-configuration: |
+          {"apiVersion":"gateway.networking.k8s.io/v1","kind":"HTTPRoute","metadata":{"annotations":{},"name":"httproute-btls-2","namespace":"routes"},"spec":{"parentRefs":[{"name":"gateway-btls-2","namespace":"gateways","sectionName":"http"}],"rules":[{"backendRefs":[{"name":"http-backend-2","namespace":"backends","port":8080}]}]}}
+      creationTimestamp: "2024-02-05T09:28:37Z"
+      generation: 1
+      name: httproute-btls-2
+      namespace: routes
+      resourceVersion: "1539"
+      uid: bcff1fbb-bb92-4d36-b19e-e39b4e188bd7
+    spec:
+      parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: gateway-btls-2
+          namespace: gateways
+          sectionName: http
+      rules:
+        - backendRefs:
+            - group: ""
+              kind: Service
+              name: http-backend-2
+              namespace: backends
+              port: 8080
+              weight: 1
+          matches:
+            - path:
+                type: PathPrefix
+                value: /
+    status:
+      parents:
+        - conditions:
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Route is accepted
+              observedGeneration: 1
+              reason: Accepted
+              status: "True"
+              type: Accepted
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Resolved all the Object references for the Route
+              observedGeneration: 1
+              reason: ResolvedRefs
+              status: "True"
+              type: ResolvedRefs
+          controllerName: gateway.envoyproxy.io/gatewayclass-controller
+          parentRef:
+            group: gateway.networking.k8s.io
+            kind: Gateway
+            name: gateway-btls-2
+            namespace: gateways
+            sectionName: http
+  - apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/last-applied-configuration: |
+          {"apiVersion":"gateway.networking.k8s.io/v1","kind":"HTTPRoute","metadata":{"annotations":{},"name":"httproute-btls-3","namespace":"routes"},"spec":{"parentRefs":[{"name":"gateway-btls-3","namespace":"gateways","sectionName":"http"}],"rules":[{"backendRefs":[{"name":"http-backend-3","namespace":"backends","port":8080}]}]}}
+      creationTimestamp: "2024-02-05T09:28:37Z"
+      generation: 1
+      name: httproute-btls-3
+      namespace: routes
+      resourceVersion: "1541"
+      uid: 5769d656-7518-4fc9-aac0-50208a80b522
+    spec:
+      parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: gateway-btls-3
+          namespace: gateways
+          sectionName: http
+      rules:
+        - backendRefs:
+            - group: ""
+              kind: Service
+              name: http-backend-3
+              namespace: backends
+              port: 8080
+              weight: 1
+          matches:
+            - path:
+                type: PathPrefix
+                value: /
+    status:
+      parents:
+        - conditions:
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Route is accepted
+              observedGeneration: 1
+              reason: Accepted
+              status: "True"
+              type: Accepted
+            - lastTransitionTime: "2024-02-05T09:28:37Z"
+              message: Resolved all the Object references for the Route
+              observedGeneration: 1
+              reason: ResolvedRefs
+              status: "True"
+              type: ResolvedRefs
+          controllerName: gateway.envoyproxy.io/gatewayclass-controller
+          parentRef:
+            group: gateway.networking.k8s.io
+            kind: Gateway
+            name: gateway-btls-3
+            namespace: gateways
+            sectionName: http
+
+backendTLSPolicies:
+  - apiVersion: gateway.networking.k8s.io/v1alpha2
+    kind: BackendTLSPolicy
+    metadata:
+      name: policy-btls-1
+      namespace: policies
+    spec:
+      targetRef:
+        group: ""
+        kind: Service
+        name: http-backend-1
+        namespace: backends
+        sectionName: "8080"
+      tls:
+        caCertRefs:
+          - group: ""
+            kind: ConfigMap
+            name: ca-cmap
+          - group: ""
+            kind: Secret
+            name: cert-key-secret
+        hostname: example.com
+    status:
+      ancestors:
+        - ancestorRef:
+            group: gateway.networking.k8s.io
+            kind: Gateway
+            name: gateway-btls-1
+            namespace: gateways
+            sectionName: http
+          conditions:
+            - lastTransitionTime: "2024-02-05T09:31:24Z"
+              message: BackendTLSPolicy is Accepted
+              observedGeneration: 1
+              reason: Accepted
+              status: "True"
+              type: Accepted
+          controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  - apiVersion: gateway.networking.k8s.io/v1alpha2
+    kind: BackendTLSPolicy
+    metadata:
+      name: policy-btls-2
+      namespace: policies
+    spec:
+      targetRef:
+        group: ""
+        kind: Service
+        name: http-backend-2
+        namespace: backends
+        sectionName: "8080"
+      tls:
+        caCertRefs:
+          - group: ""
+            kind: Secret
+            name: cert-key-secret
+        hostname: example.com
+    status:
+      ancestors:
+        - ancestorRef:
+            group: gateway.networking.k8s.io
+            kind: Gateway
+            name: gateway-btls-2
+            namespace: gateways
+            sectionName: http
+          conditions:
+            - lastTransitionTime: "2024-02-05T09:31:24Z"
+              message: no refered configmap found
+              observedGeneration: 1
+              reason: Invalid
+              status: "False"
+              type: Accepted
+          controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  - apiVersion: gateway.networking.k8s.io/v1alpha2
+    kind: BackendTLSPolicy
+    metadata:
+      name: policy-btls-3
+      namespace: policies
+    spec:
+      targetRef:
+        group: ""
+        kind: Service
+        name: http-backend-3
+        namespace: backends
+        sectionName: "8080"
+      tls:
+        caCertRefs:
+          - group: ""
+            kind: ConfigMap
+            name: ca-cmap
+        hostname: example.com
+    status:
+      ancestors:
+        - ancestorRef:
+            group: gateway.networking.k8s.io
+            kind: Gateway
+            name: gateway-btls-3
+            namespace: gateways
+            sectionName: http
+          conditions:
+            - lastTransitionTime: "2024-02-05T09:31:24Z"
+              message: BackendTLSPolicy is Accepted
+              observedGeneration: 1
+              reason: Accepted
+              status: "True"
+              type: Accepted
+          controllerName: gateway.envoyproxy.io/gatewayclass-controller
+
+xdsIR:
+  gateways/gateway-btls-1:
+    accessLog:
+      text:
+        - path: /dev/stdout
+    http:
+      - address: 0.0.0.0
+        hostnames:
+          - '*'
+        isHTTP2: false
+        name: gateways/gateway-btls-1/http
+        port: 10080
+        routes:
+          - backendTLS:
+              CaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURKekNDQWcrZ0F3SUJBZ0lVQWw2VUtJdUttenRlODFjbGx6NVBmZE4ySWxJd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0l6RVFNQTRHQTFVRUF3d0hiWGxqYVdWdWRERVBNQTBHQTFVRUNnd0dhM1ZpWldSaU1CNFhEVEl6TVRBdwpNakExTkRFMU4xb1hEVEkwTVRBd01UQTFOREUxTjFvd0l6RVFNQTRHQTFVRUF3d0hiWGxqYVdWdWRERVBNQTBHCkExVUVDZ3dHYTNWaVpXUmlNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXdTVGMKMXlqOEhXNjJueW5rRmJYbzRWWEt2MmpDMFBNN2RQVmt5ODdGd2VaY1RLTG9XUVZQUUUycDJrTERLNk9Fc3ptTQp5eXIreHhXdHlpdmVyZW1yV3FuS2tOVFloTGZZUGhnUWtjemliN2VVYWxtRmpVYmhXZEx2SGFrYkVnQ29kbjNiCmt6NTdtSW5YMlZwaURPS2c0a3lIZml1WFdwaUJxckN4MEtOTHB4bzNERVFjRmNzUVRlVEh6aDQ3NTJHVjA0UlUKVGkvR0VXeXpJc2w0Umc3dEd0QXdtY0lQZ1VOVWZZMlEzOTBGR3FkSDRhaG4rbXcvNmFGYlczMVc2M2Q5WUpWcQppb3lPVmNhTUlwTTVCL2M3UWM4U3VoQ0kxWUdoVXlnNGNSSExFdzVWdGlraW95RTNYMDRrbmEzalFBajU0WWJSCmJwRWhjMzVhcEtMQjIxSE9VUUlEQVFBQm8xTXdVVEFkQmdOVkhRNEVGZ1FVeXZsMFZJNXZKVlN1WUZYdTdCNDgKNlBiTUVBb3dId1lEVlIwakJCZ3dGb0FVeXZsMFZJNXZKVlN1WUZYdTdCNDg2UGJNRUFvd0R3WURWUjBUQVFILwpCQVV3QXdFQi96QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFNTHhyZ0ZWTXVOUnEyd0F3Y0J0N1NuTlI1Q2Z6CjJNdlhxNUVVbXVhd0lVaTlrYVlqd2RWaURSRUdTams3SlcxN3ZsNTc2SGpEa2RmUndpNEUyOFN5ZFJJblpmNkoKaThIWmNaN2NhSDZEeFIzMzVmZ0hWekxpNU5pVGNlL09qTkJRelEyTUpYVkRkOERCbUc1ZnlhdEppT0pRNGJXRQpBN0ZsUDBSZFAzQ08zR1dFME01aVhPQjJtMXFXa0UyZXlPNFVIdndUcU5RTGRyZEFYZ0RRbGJhbTllNEJHM0dnCmQvNnRoQWtXRGJ0L1FOVCtFSkhEQ3ZoRFJLaDFSdUdIeWcrWSsvbmViVFdXckZXc2t0UnJiT29IQ1ppQ3BYSTEKM2VYRTZudDBZa2d0RHhHMjJLcW5ocEFnOWdVU3MyaGxob3h5dmt6eUYwbXU2TmhQbHdBZ25xNysvUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0KCi0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQpNSUlESnpDQ0FnK2dBd0lCQWdJVUFsNlVLSXVLbXp0ZTgxY2xsejVQZmROMklsSXdEUVlKS29aSWh2Y05BUUVMCkJRQXdJekVRTUE0R0ExVUVBd3dIYlhsamFXVnVkREVQTUEwR0ExVUVDZ3dHYTNWaVpXUmlNQjRYRFRJek1UQXcKTWpBMU5ERTFOMW9YRFRJME1UQXdNVEExTkRFMU4xb3dJekVRTUE0R0ExVUVBd3dIYlhsamFXVnVkREVQTUEwRwpBMVVFQ2d3R2EzVmlaV1JpTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF3U1RjCjF5ajhIVzYybnlua0ZiWG80VlhLdjJqQzBQTTdkUFZreTg3RndlWmNUS0xvV1FWUFFFMnAya0xESzZPRXN6bU0KeXlyK3h4V3R5aXZlcmVtcldxbktrTlRZaExmWVBoZ1FrY3ppYjdlVWFsbUZqVWJoV2RMdkhha2JFZ0NvZG4zYgprejU3bUluWDJWcGlET0tnNGt5SGZpdVhXcGlCcXJDeDBLTkxweG8zREVRY0Zjc1FUZVRIemg0NzUyR1YwNFJVClRpL0dFV3l6SXNsNFJnN3RHdEF3bWNJUGdVTlVmWTJRMzkwRkdxZEg0YWhuK213LzZhRmJXMzFXNjNkOVlKVnEKaW95T1ZjYU1JcE01Qi9jN1FjOFN1aENJMVlHaFV5ZzRjUkhMRXc1VnRpa2lveUUzWDA0a25hM2pRQWo1NFliUgpicEVoYzM1YXBLTEIyMUhPVVFJREFRQUJvMU13VVRBZEJnTlZIUTRFRmdRVXl2bDBWSTV2SlZTdVlGWHU3QjQ4CjZQYk1FQW93SHdZRFZSMGpCQmd3Rm9BVXl2bDBWSTV2SlZTdVlGWHU3QjQ4NlBiTUVBb3dEd1lEVlIwVEFRSC8KQkFVd0F3RUIvekFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBTUx4cmdGVk11TlJxMndBd2NCdDdTbk5SNUNmegoyTXZYcTVFVW11YXdJVWk5a2FZandkVmlEUkVHU2prN0pXMTd2bDU3NkhqRGtkZlJ3aTRFMjhTeWRSSW5aZjZKCmk4SFpjWjdjYUg2RHhSMzM1ZmdIVnpMaTVOaVRjZS9Pak5CUXpRMk1KWFZEZDhEQm1HNWZ5YXRKaU9KUTRiV0UKQTdGbFAwUmRQM0NPM0dXRTBNNWlYT0IybTFxV2tFMmV5TzRVSHZ3VHFOUUxkcmRBWGdEUWxiYW05ZTRCRzNHZwpkLzZ0aEFrV0RidC9RTlQrRUpIREN2aERSS2gxUnVHSHlnK1krL25lYlRXV3JGV3NrdFJyYk9vSENaaUNwWEkxCjNlWEU2bnQwWWtndER4RzIyS3FuaHBBZzlnVVNzMmhsaG94eXZrenlGMG11Nk5oUGx3QWducTcrL1E9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+              CertificateByte: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJHekNCd2dJSkFJL3gxc0NEL0lSa01Bb0dDQ3FHU000OUJBTUNNQll4RkRBU0JnTlZCQU1NQzJadmJ5NWkKWVhJdVkyOXRNQjRYRFRJek1ERXdOVEl4TlRNeU9Wb1hEVEkwTURFd05USXhOVE15T1Zvd0ZqRVVNQklHQTFVRQpBd3dMWm05dkxtSmhjaTVqYjIwd1dUQVRCZ2NxaGtqT1BRSUJCZ2dxaGtqT1BRTUJCd05DQUFRZmxXMnR6T3M4Cm82Nk5USVRmYUhucEc2UzI3Y2hkSldzallKdWJISkFtT2tYdS8rVGxLTXhGUzl4R2tHK09BQjAyR0ZQaHhQVzcKRnFaTFJoOEp0YlZkTUFvR0NDcUdTTTQ5QkFNQ0EwZ0FNRVVDSVFEdlplU1pBZ1VWV2VpM3o0ZEhOTEd0aHpiaQoxRHZ0anRQekhYZ1R3WS92YmdJZ05KWStNcTRweFJnNit3eU04R1R4czVUV3k5Zml5RGhMUEU5QnhlbEsxSjQ9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              Hostname: example.com
+              Name: policy-btls-1/policies
+              PrivateKeyByte: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUxEbnZNM1RKM3NHYm9EeTF4T3dqSVppVFNWeWZXVWF5YVExcWdrdUdacEtvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFSDVWdHJjenJQS091alV5RTMyaDU2UnVrdHUzSVhTVnJJMkNibXh5UUpqcEY3di9rNVNqTQpSVXZjUnBCdmpnQWROaGhUNGNUMXV4YW1TMFlmQ2JXMVhRPT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=
+            backendWeights:
+              invalid: 0
+              valid: 0
+            destination:
+              name: httproute/routes/httproute-btls-1/rule/0
+              settings:
+                - endpoints:
+                    - host: 10.244.0.10
+                      port: 8080
+                  protocol: HTTP
+                  weight: 1
+            hostname: '*'
+            name: httproute/routes/httproute-btls-1/rule/0/match/0/*
+            pathMatch:
+              distinct: false
+              name: ""
+              prefix: /
+  gateways/gateway-btls-2:
+    accessLog:
+      text:
+        - path: /dev/stdout
+    http:
+      - address: 0.0.0.0
+        hostnames:
+          - '*'
+        isHTTP2: false
+        name: gateways/gateway-btls-2/http
+        port: 10080
+        routes:
+          - backendWeights:
+              invalid: 0
+              valid: 0
+            destination:
+              name: httproute/routes/httproute-btls-2/rule/0
+              settings:
+                - endpoints:
+                    - host: 10.244.0.11
+                      port: 8080
+                  protocol: HTTP
+                  weight: 1
+            hostname: '*'
+            name: httproute/routes/httproute-btls-2/rule/0/match/0/*
+            pathMatch:
+              distinct: false
+              name: ""
+              prefix: /
+  gateways/gateway-btls-3:
+    accessLog:
+      text:
+        - path: /dev/stdout
+    http:
+      - address: 0.0.0.0
+        hostnames:
+          - '*'
+        isHTTP2: false
+        name: gateways/gateway-btls-3/http
+        port: 10080
+        routes:
+          - backendTLS:
+              CaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURKekNDQWcrZ0F3SUJBZ0lVQWw2VUtJdUttenRlODFjbGx6NVBmZE4ySWxJd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0l6RVFNQTRHQTFVRUF3d0hiWGxqYVdWdWRERVBNQTBHQTFVRUNnd0dhM1ZpWldSaU1CNFhEVEl6TVRBdwpNakExTkRFMU4xb1hEVEkwTVRBd01UQTFOREUxTjFvd0l6RVFNQTRHQTFVRUF3d0hiWGxqYVdWdWRERVBNQTBHCkExVUVDZ3dHYTNWaVpXUmlNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXdTVGMKMXlqOEhXNjJueW5rRmJYbzRWWEt2MmpDMFBNN2RQVmt5ODdGd2VaY1RLTG9XUVZQUUUycDJrTERLNk9Fc3ptTQp5eXIreHhXdHlpdmVyZW1yV3FuS2tOVFloTGZZUGhnUWtjemliN2VVYWxtRmpVYmhXZEx2SGFrYkVnQ29kbjNiCmt6NTdtSW5YMlZwaURPS2c0a3lIZml1WFdwaUJxckN4MEtOTHB4bzNERVFjRmNzUVRlVEh6aDQ3NTJHVjA0UlUKVGkvR0VXeXpJc2w0Umc3dEd0QXdtY0lQZ1VOVWZZMlEzOTBGR3FkSDRhaG4rbXcvNmFGYlczMVc2M2Q5WUpWcQppb3lPVmNhTUlwTTVCL2M3UWM4U3VoQ0kxWUdoVXlnNGNSSExFdzVWdGlraW95RTNYMDRrbmEzalFBajU0WWJSCmJwRWhjMzVhcEtMQjIxSE9VUUlEQVFBQm8xTXdVVEFkQmdOVkhRNEVGZ1FVeXZsMFZJNXZKVlN1WUZYdTdCNDgKNlBiTUVBb3dId1lEVlIwakJCZ3dGb0FVeXZsMFZJNXZKVlN1WUZYdTdCNDg2UGJNRUFvd0R3WURWUjBUQVFILwpCQVV3QXdFQi96QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFNTHhyZ0ZWTXVOUnEyd0F3Y0J0N1NuTlI1Q2Z6CjJNdlhxNUVVbXVhd0lVaTlrYVlqd2RWaURSRUdTams3SlcxN3ZsNTc2SGpEa2RmUndpNEUyOFN5ZFJJblpmNkoKaThIWmNaN2NhSDZEeFIzMzVmZ0hWekxpNU5pVGNlL09qTkJRelEyTUpYVkRkOERCbUc1ZnlhdEppT0pRNGJXRQpBN0ZsUDBSZFAzQ08zR1dFME01aVhPQjJtMXFXa0UyZXlPNFVIdndUcU5RTGRyZEFYZ0RRbGJhbTllNEJHM0dnCmQvNnRoQWtXRGJ0L1FOVCtFSkhEQ3ZoRFJLaDFSdUdIeWcrWSsvbmViVFdXckZXc2t0UnJiT29IQ1ppQ3BYSTEKM2VYRTZudDBZa2d0RHhHMjJLcW5ocEFnOWdVU3MyaGxob3h5dmt6eUYwbXU2TmhQbHdBZ25xNysvUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0KCi0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQpNSUlESnpDQ0FnK2dBd0lCQWdJVUFsNlVLSXVLbXp0ZTgxY2xsejVQZmROMklsSXdEUVlKS29aSWh2Y05BUUVMCkJRQXdJekVRTUE0R0ExVUVBd3dIYlhsamFXVnVkREVQTUEwR0ExVUVDZ3dHYTNWaVpXUmlNQjRYRFRJek1UQXcKTWpBMU5ERTFOMW9YRFRJME1UQXdNVEExTkRFMU4xb3dJekVRTUE0R0ExVUVBd3dIYlhsamFXVnVkREVQTUEwRwpBMVVFQ2d3R2EzVmlaV1JpTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF3U1RjCjF5ajhIVzYybnlua0ZiWG80VlhLdjJqQzBQTTdkUFZreTg3RndlWmNUS0xvV1FWUFFFMnAya0xESzZPRXN6bU0KeXlyK3h4V3R5aXZlcmVtcldxbktrTlRZaExmWVBoZ1FrY3ppYjdlVWFsbUZqVWJoV2RMdkhha2JFZ0NvZG4zYgprejU3bUluWDJWcGlET0tnNGt5SGZpdVhXcGlCcXJDeDBLTkxweG8zREVRY0Zjc1FUZVRIemg0NzUyR1YwNFJVClRpL0dFV3l6SXNsNFJnN3RHdEF3bWNJUGdVTlVmWTJRMzkwRkdxZEg0YWhuK213LzZhRmJXMzFXNjNkOVlKVnEKaW95T1ZjYU1JcE01Qi9jN1FjOFN1aENJMVlHaFV5ZzRjUkhMRXc1VnRpa2lveUUzWDA0a25hM2pRQWo1NFliUgpicEVoYzM1YXBLTEIyMUhPVVFJREFRQUJvMU13VVRBZEJnTlZIUTRFRmdRVXl2bDBWSTV2SlZTdVlGWHU3QjQ4CjZQYk1FQW93SHdZRFZSMGpCQmd3Rm9BVXl2bDBWSTV2SlZTdVlGWHU3QjQ4NlBiTUVBb3dEd1lEVlIwVEFRSC8KQkFVd0F3RUIvekFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBTUx4cmdGVk11TlJxMndBd2NCdDdTbk5SNUNmegoyTXZYcTVFVW11YXdJVWk5a2FZandkVmlEUkVHU2prN0pXMTd2bDU3NkhqRGtkZlJ3aTRFMjhTeWRSSW5aZjZKCmk4SFpjWjdjYUg2RHhSMzM1ZmdIVnpMaTVOaVRjZS9Pak5CUXpRMk1KWFZEZDhEQm1HNWZ5YXRKaU9KUTRiV0UKQTdGbFAwUmRQM0NPM0dXRTBNNWlYT0IybTFxV2tFMmV5TzRVSHZ3VHFOUUxkcmRBWGdEUWxiYW05ZTRCRzNHZwpkLzZ0aEFrV0RidC9RTlQrRUpIREN2aERSS2gxUnVHSHlnK1krL25lYlRXV3JGV3NrdFJyYk9vSENaaUNwWEkxCjNlWEU2bnQwWWtndER4RzIyS3FuaHBBZzlnVVNzMmhsaG94eXZrenlGMG11Nk5oUGx3QWducTcrL1E9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+              CertificateByte: null
+              Hostname: example.com
+              Name: policy-btls-3/policies
+              PrivateKeyByte: null
+            backendWeights:
+              invalid: 0
+              valid: 0
+            destination:
+              name: httproute/routes/httproute-btls-3/rule/0
+              settings:
+                - endpoints:
+                    - host: 10.244.0.12
+                      port: 8080
+                  protocol: HTTP
+                  weight: 1
+            hostname: '*'
+            name: httproute/routes/httproute-btls-3/rule/0/match/0/*
+            pathMatch:
+              distinct: false
+              name: ""
+              prefix: /
+
+infraIR:
+  gateways/gateway-btls-1:
+    proxy:
+      config:
+        apiVersion: gateway.envoyproxy.io/v1alpha1
+        kind: EnvoyProxy
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/last-applied-configuration: |
+              {"apiVersion":"gateway.envoyproxy.io/v1alpha1","kind":"EnvoyProxy","metadata":{"annotations":{},"name":"custom-proxy-config","namespace":"envoy-gateway-system"},"spec":{"provider":{"kubernetes":{"envoyService":{"type":"ClusterIP"}},"type":"Kubernetes"}}}
+          creationTimestamp: "2024-02-05T09:22:44Z"
+          generation: 1
+          managedFields:
+            - apiVersion: gateway.envoyproxy.io/v1alpha1
+              fieldsType: FieldsV1
+              fieldsV1:
+                f:metadata:
+                  f:annotations:
+                    .: {}
+                    f:kubectl.kubernetes.io/last-applied-configuration: {}
+                f:spec:
+                  .: {}
+                  f:logging:
+                    .: {}
+                    f:level:
+                      .: {}
+                      f:default: {}
+                  f:provider:
+                    .: {}
+                    f:kubernetes:
+                      .: {}
+                      f:envoyService:
+                        .: {}
+                        f:type: {}
+                    f:type: {}
+              manager: kubectl-client-side-apply
+              operation: Update
+              time: "2024-02-05T09:22:44Z"
+          name: custom-proxy-config
+          namespace: envoy-gateway-system
+          resourceVersion: "842"
+          uid: e902849a-bc98-41d2-8520-b8286f95f1ac
+        spec:
+          logging:
+            level:
+              default: warn
+          provider:
+            kubernetes:
+              envoyService:
+                type: ClusterIP
+            type: Kubernetes
+        status: {}
+      listeners:
+        - address: ""
+          ports:
+            - containerPort: 10080
+              name: http
+              protocol: HTTP
+              servicePort: 80
+      metadata:
+        labels:
+          gateway.envoyproxy.io/owning-gateway-name: gateway-btls-1
+          gateway.envoyproxy.io/owning-gateway-namespace: gateways
+      name: gateways/gateway-btls-1
+  gateways/gateway-btls-2:
+    proxy:
+      config:
+        apiVersion: gateway.envoyproxy.io/v1alpha1
+        kind: EnvoyProxy
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/last-applied-configuration: |
+              {"apiVersion":"gateway.envoyproxy.io/v1alpha1","kind":"EnvoyProxy","metadata":{"annotations":{},"name":"custom-proxy-config","namespace":"envoy-gateway-system"},"spec":{"provider":{"kubernetes":{"envoyService":{"type":"ClusterIP"}},"type":"Kubernetes"}}}
+          creationTimestamp: "2024-02-05T09:22:44Z"
+          generation: 1
+          managedFields:
+            - apiVersion: gateway.envoyproxy.io/v1alpha1
+              fieldsType: FieldsV1
+              fieldsV1:
+                f:metadata:
+                  f:annotations:
+                    .: {}
+                    f:kubectl.kubernetes.io/last-applied-configuration: {}
+                f:spec:
+                  .: {}
+                  f:logging:
+                    .: {}
+                    f:level:
+                      .: {}
+                      f:default: {}
+                  f:provider:
+                    .: {}
+                    f:kubernetes:
+                      .: {}
+                      f:envoyService:
+                        .: {}
+                        f:type: {}
+                    f:type: {}
+              manager: kubectl-client-side-apply
+              operation: Update
+              time: "2024-02-05T09:22:44Z"
+          name: custom-proxy-config
+          namespace: envoy-gateway-system
+          resourceVersion: "842"
+          uid: e902849a-bc98-41d2-8520-b8286f95f1ac
+        spec:
+          logging:
+            level:
+              default: warn
+          provider:
+            kubernetes:
+              envoyService:
+                type: ClusterIP
+            type: Kubernetes
+        status: {}
+      listeners:
+        - address: ""
+          ports:
+            - containerPort: 10080
+              name: http
+              protocol: HTTP
+              servicePort: 80
+      metadata:
+        labels:
+          gateway.envoyproxy.io/owning-gateway-name: gateway-btls-2
+          gateway.envoyproxy.io/owning-gateway-namespace: gateways
+      name: gateways/gateway-btls-2
+  gateways/gateway-btls-3:
+    proxy:
+      config:
+        apiVersion: gateway.envoyproxy.io/v1alpha1
+        kind: EnvoyProxy
+        metadata:
+          annotations:
+            kubectl.kubernetes.io/last-applied-configuration: |
+              {"apiVersion":"gateway.envoyproxy.io/v1alpha1","kind":"EnvoyProxy","metadata":{"annotations":{},"name":"custom-proxy-config","namespace":"envoy-gateway-system"},"spec":{"provider":{"kubernetes":{"envoyService":{"type":"ClusterIP"}},"type":"Kubernetes"}}}
+          creationTimestamp: "2024-02-05T09:22:44Z"
+          generation: 1
+          managedFields:
+            - apiVersion: gateway.envoyproxy.io/v1alpha1
+              fieldsType: FieldsV1
+              fieldsV1:
+                f:metadata:
+                  f:annotations:
+                    .: {}
+                    f:kubectl.kubernetes.io/last-applied-configuration: {}
+                f:spec:
+                  .: {}
+                  f:logging:
+                    .: {}
+                    f:level:
+                      .: {}
+                      f:default: {}
+                  f:provider:
+                    .: {}
+                    f:kubernetes:
+                      .: {}
+                      f:envoyService:
+                        .: {}
+                        f:type: {}
+                    f:type: {}
+              manager: kubectl-client-side-apply
+              operation: Update
+              time: "2024-02-05T09:22:44Z"
+          name: custom-proxy-config
+          namespace: envoy-gateway-system
+          resourceVersion: "842"
+          uid: e902849a-bc98-41d2-8520-b8286f95f1ac
+        spec:
+          logging:
+            level:
+              default: warn
+          provider:
+            kubernetes:
+              envoyService:
+                type: ClusterIP
+            type: Kubernetes
+        status: {}
+      listeners:
+        - address: ""
+          ports:
+            - containerPort: 10080
+              name: http
+              protocol: HTTP
+              servicePort: 80
+      metadata:
+        labels:
+          gateway.envoyproxy.io/owning-gateway-name: gateway-btls-3
+          gateway.envoyproxy.io/owning-gateway-namespace: gateways
+      name: gateways/gateway-btls-3

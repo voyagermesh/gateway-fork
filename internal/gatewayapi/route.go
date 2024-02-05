@@ -1256,8 +1256,11 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 
 	ca := ""
 
+	cmapFound := false
+
 	for _, cmap := range configmaps {
 		if kind, ok := caRefMap[cmap.Name]; ok && kind == cmap.Kind {
+			cmapFound = true
 			if crt, dataOk := cmap.Data["ca.crt"]; dataOk {
 				if ca != "" {
 					ca += "\n"
@@ -1282,6 +1285,9 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 		}
 	}
 
+	if !cmapFound {
+		return fmt.Errorf("no refered configmap found"), nil
+	}
 	if ca == "" {
 		return fmt.Errorf("no ca found in referred configmaps"), nil
 	}
