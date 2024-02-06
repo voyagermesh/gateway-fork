@@ -251,6 +251,7 @@ func TestTranslate(t *testing.T) {
 			mustUnmarshal(t, output, want)
 
 			opts := cmpopts.IgnoreFields(metav1.Condition{}, "LastTransitionTime")
+			fmt.Printf("%v", want.XdsIR["envoy-gateway/gateway-btls-1"].HTTP[0].Routes[0].Name)
 			require.Empty(t, cmp.Diff(want, got, opts))
 		})
 	}

@@ -3,7 +3,7 @@ gateways:
   kind: Gateway
   metadata:
     name: gateway-btls-1
-    namespace: gateways
+    namespace: envoy-gateway
   spec:
     gatewayClassName: envoy-gateway-class
     listeners:
@@ -45,7 +45,7 @@ gateways:
   kind: Gateway
   metadata:
     name: gateway-btls-2
-    namespace: gateways
+    namespace: envoy-gateway
   spec:
     gatewayClassName: envoy-gateway-class
     listeners:
@@ -87,7 +87,7 @@ gateways:
   kind: Gateway
   metadata:
     name: gateway-btls-3
-    namespace: gateways
+    namespace: envoy-gateway
   spec:
     gatewayClassName: envoy-gateway-class
     listeners:
@@ -137,7 +137,7 @@ httpRoutes:
       - group: gateway.networking.k8s.io
         kind: Gateway
         name: gateway-btls-1
-        namespace: gateways
+        namespace: envoy-gateway
         sectionName: http
     rules:
       - backendRefs:
@@ -171,7 +171,7 @@ httpRoutes:
           group: gateway.networking.k8s.io
           kind: Gateway
           name: gateway-btls-1
-          namespace: gateways
+          namespace: envoy-gateway
           sectionName: http
 - apiVersion: gateway.networking.k8s.io/v1
   kind: HTTPRoute
@@ -183,7 +183,7 @@ httpRoutes:
       - group: gateway.networking.k8s.io
         kind: Gateway
         name: gateway-btls-2
-        namespace: gateways
+        namespace: envoy-gateway
         sectionName: http
     rules:
       - backendRefs:
@@ -217,7 +217,7 @@ httpRoutes:
           group: gateway.networking.k8s.io
           kind: Gateway
           name: gateway-btls-2
-          namespace: gateways
+          namespace: envoy-gateway
           sectionName: http
 - apiVersion: gateway.networking.k8s.io/v1
   kind: HTTPRoute
@@ -229,7 +229,7 @@ httpRoutes:
       - group: gateway.networking.k8s.io
         kind: Gateway
         name: gateway-btls-3
-        namespace: gateways
+        namespace: envoy-gateway
         sectionName: http
     rules:
       - backendRefs:
@@ -263,7 +263,7 @@ httpRoutes:
           group: gateway.networking.k8s.io
           kind: Gateway
           name: gateway-btls-3
-          namespace: gateways
+          namespace: envoy-gateway
           sectionName: http
 
 backendTLSPolicies:
@@ -294,7 +294,7 @@ backendTLSPolicies:
           group: gateway.networking.k8s.io
           kind: Gateway
           name: gateway-btls-1
-          namespace: gateways
+          namespace: envoy-gateway
           sectionName: http
         conditions:
           - lastTransitionTime: "2024-02-05T09:31:24Z"
@@ -328,7 +328,7 @@ backendTLSPolicies:
           group: gateway.networking.k8s.io
           kind: Gateway
           name: gateway-btls-2
-          namespace: gateways
+          namespace: envoy-gateway
           sectionName: http
         conditions:
           - lastTransitionTime: "2024-02-05T09:31:24Z"
@@ -362,7 +362,7 @@ backendTLSPolicies:
           group: gateway.networking.k8s.io
           kind: Gateway
           name: gateway-btls-3
-          namespace: gateways
+          namespace: envoy-gateway
           sectionName: http
         conditions:
           - lastTransitionTime: "2024-02-05T09:31:24Z"
@@ -374,7 +374,7 @@ backendTLSPolicies:
         controllerName: gateway.envoyproxy.io/gatewayclass-controller
 
 xdsIR:
-  gateways/gateway-btls-1:
+  envoy-gateway/gateway-btls-1:
     accessLog:
       text:
         - path: /dev/stdout
@@ -383,7 +383,7 @@ xdsIR:
         hostnames:
           - '*'
         isHTTP2: false
-        name: gateways/gateway-btls-1/http
+        name: envoy-gateway/gateway-btls-1/http
         port: 10080
         routes:
           - backendTLS:
@@ -409,7 +409,7 @@ xdsIR:
               distinct: false
               name: ""
               prefix: /
-  gateways/gateway-btls-2:
+  envoy-gateway/gateway-btls-2:
     accessLog:
       text:
         - path: /dev/stdout
@@ -418,7 +418,7 @@ xdsIR:
         hostnames:
           - '*'
         isHTTP2: false
-        name: gateways/gateway-btls-2/http
+        name: envoy-gateway/gateway-btls-2/http
         port: 10080
         routes:
           - backendWeights:
@@ -438,7 +438,7 @@ xdsIR:
               distinct: false
               name: ""
               prefix: /
-  gateways/gateway-btls-3:
+  envoy-gateway/gateway-btls-3:
     accessLog:
       text:
         - path: /dev/stdout
@@ -447,7 +447,7 @@ xdsIR:
         hostnames:
           - '*'
         isHTTP2: false
-        name: gateways/gateway-btls-3/http
+        name: envoy-gateway/gateway-btls-3/http
         port: 10080
         routes:
           - backendTLS:
@@ -475,7 +475,7 @@ xdsIR:
               prefix: /
 
 infraIR:
-  gateways/gateway-btls-1:
+  envoy-gateway/gateway-btls-1:
     proxy:
       config:
         apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -536,9 +536,9 @@ infraIR:
       metadata:
         labels:
           gateway.envoyproxy.io/owning-gateway-name: gateway-btls-1
-          gateway.envoyproxy.io/owning-gateway-namespace: gateways
-      name: gateways/gateway-btls-1
-  gateways/gateway-btls-2:
+          gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway
+      name: envoy-gateway/gateway-btls-1
+  envoy-gateway/gateway-btls-2:
     proxy:
       config:
         apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -599,9 +599,9 @@ infraIR:
       metadata:
         labels:
           gateway.envoyproxy.io/owning-gateway-name: gateway-btls-2
-          gateway.envoyproxy.io/owning-gateway-namespace: gateways
-      name: gateways/gateway-btls-2
-  gateways/gateway-btls-3:
+          gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway
+      name: envoy-gateway/gateway-btls-2
+  envoy-gateway/gateway-btls-3:
     proxy:
       config:
         apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -662,5 +662,5 @@ infraIR:
       metadata:
         labels:
           gateway.envoyproxy.io/owning-gateway-name: gateway-btls-3
-          gateway.envoyproxy.io/owning-gateway-namespace: gateways
-      name: gateways/gateway-btls-3
+          gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway
+      name: envoy-gateway/gateway-btls-3

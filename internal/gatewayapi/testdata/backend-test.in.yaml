@@ -3,7 +3,7 @@ gateways:
     kind: Gateway
     metadata:
       name: gateway-btls-1
-      namespace: gateways
+      namespace: envoy-gateway
     spec:
       gatewayClassName: envoy-gateway-class
       listeners:
@@ -14,11 +14,49 @@ gateways:
             namespaces:
               from: All
 
+
+httpRoutes:
+  - apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      name: httproute-btls-1
+      namespace: routes
+    spec:
+      parentRefs:
+        - namespace: envoy-gateway
+          name: gateway-btls-1
+          sectionName: http
+      rules:
+        - matches:
+            - path:
+                type: Exact
+                value: "/exact"
+          backendRefs:
+            - name: http-backend-1
+              namespace: backends
+              port: 8080
+
 referenceGrants:
   - apiVersion: gateway.networking.k8s.io/v1alpha2
     kind: ReferenceGrant
     metadata:
       name: refg-route-svc
+      namespace: backends
+    spec:
+      from:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
+          namespace: routes
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          namespace: envoy-gateway
+      to:
+        - group: ""
+          kind: Service
+  - apiVersion: gateway.networking.k8s.io/v1alpha2
+    kind: ReferenceGrant
+    metadata:
+      name: refg-route-gw
       namespace: backends
     spec:
       from:
@@ -37,7 +75,7 @@ services:
       name: http-backend-1
       namespace: backends
     spec:
-      clusterIP: 1.1.1.1
+      clusterIP: 10.11.12.13
       ports:
         - port: 8080
           name: http
@@ -60,25 +98,9 @@ endpointSlices:
         port: 8080
     endpoints:
       - addresses:
-          - "10.244.0.10"
+          - "10.244.0.11"
         conditions:
           ready: true
 
-httpRoutes:
-  - apiVersion: gateway.networking.k8s.io/v1
-    kind: HTTPRoute
-    metadata:
-      name: httproute-btls-1
-      namespace: routes
-    spec:
-      parentRefs:
-        - namespace: gateways
-          name: gateway-btls-1
-          sectionName: http
-      rules:
-        - backendRefs:
-            - name: http-backend-1
-              namespace: backends
-              port: 8080
 
 
