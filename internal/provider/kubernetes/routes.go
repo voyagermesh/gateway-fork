@@ -607,6 +607,11 @@ func (r *gatewayAPIReconciler) ProcessBackendTLS(ctx context.Context, targetBack
 				r.log.Info("added ReferenceGrant to resource map", "namespace", refGrant.Namespace,
 					"name", refGrant.Name)
 			}
+			for i, policy := range resTree.BackendTLSPolicies {
+				if policy.Name == bacTLSPolicy.Name && policy.Namespace == bacTLSPolicy.Namespace {
+					resTree.BackendTLSPolicies = append(resTree.BackendTLSPolicies[0:i], resTree.BackendTLSPolicies[i+1:]...)
+				}
+			}
 		} else {
 			valid = true
 		}

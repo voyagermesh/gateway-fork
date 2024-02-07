@@ -1,9 +1,42 @@
+backendTLSPolicies:
+- apiVersion: gateway.networking.k8s.io/v1alpha2
+  kind: BackendTLSPolicy
+  metadata:
+    creationTimestamp: null
+    name: policy-btls
+    namespace: policies
+  spec:
+    targetRef:
+      group: ""
+      kind: Service
+      name: http-backend
+      namespace: backends
+      sectionName: "8080"
+    tls:
+      caCertRefs:
+      - group: ""
+        kind: ConfigMap
+        name: no-ca-cmap
+      hostname: example.com
+  status:
+    ancestors:
+    - ancestorRef:
+        name: gateway-btls
+        namespace: envoy-gateway
+        sectionName: http
+      conditions:
+      - lastTransitionTime: null
+        message: no ca found in referred configmaps
+        reason: Invalid
+        status: "False"
+        type: Accepted
+      controllerName: gateway.envoyproxy.io/gatewayclass-controller
 gateways:
 - apiVersion: gateway.networking.k8s.io/v1
   kind: Gateway
   metadata:
     creationTimestamp: null
-    name: gateway-btls-1
+    name: gateway-btls
     namespace: envoy-gateway
   spec:
     gatewayClassName: envoy-gateway-class
@@ -44,16 +77,16 @@ httpRoutes:
   kind: HTTPRoute
   metadata:
     creationTimestamp: null
-    name: httproute-btls-1
+    name: httproute-btls
     namespace: envoy-gateway
   spec:
     parentRefs:
-    - name: gateway-btls-1
+    - name: gateway-btls
       namespace: envoy-gateway
       sectionName: http
     rules:
     - backendRefs:
-      - name: http-backend-1
+      - name: http-backend
         namespace: backends
         port: 8080
       matches:
@@ -75,11 +108,11 @@ httpRoutes:
         type: ResolvedRefs
       controllerName: gateway.envoyproxy.io/gatewayclass-controller
       parentRef:
-        name: gateway-btls-1
+        name: gateway-btls
         namespace: envoy-gateway
         sectionName: http
 infraIR:
-  envoy-gateway/gateway-btls-1:
+  envoy-gateway/gateway-btls:
     proxy:
       listeners:
       - address: ""
@@ -90,11 +123,11 @@ infraIR:
           servicePort: 80
       metadata:
         labels:
-          gateway.envoyproxy.io/owning-gateway-name: gateway-btls-1
+          gateway.envoyproxy.io/owning-gateway-name: gateway-btls
           gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway
-      name: envoy-gateway/gateway-btls-1
+      name: envoy-gateway/gateway-btls
 xdsIR:
-  envoy-gateway/gateway-btls-1:
+  envoy-gateway/gateway-btls:
     accessLog:
       text:
       - path: /dev/stdout
@@ -103,14 +136,14 @@ xdsIR:
       hostnames:
       - '*'
       isHTTP2: false
-      name: envoy-gateway/gateway-btls-1/http
+      name: envoy-gateway/gateway-btls/http
       port: 10080
       routes:
       - backendWeights:
           invalid: 0
           valid: 0
         destination:
-          name: httproute/envoy-gateway/httproute-btls-1/rule/0
+          name: httproute/envoy-gateway/httproute-btls/rule/0
           settings:
           - endpoints:
             - host: 10.244.0.11
@@ -118,7 +151,7 @@ xdsIR:
             protocol: HTTP
             weight: 1
         hostname: '*'
-        name: httproute/envoy-gateway/httproute-btls-1/rule/0/match/0/*
+        name: httproute/envoy-gateway/httproute-btls/rule/0/match/0/*
         pathMatch:
           distinct: false
           exact: /exact

@@ -2,7 +2,7 @@ gateways:
   - apiVersion: gateway.networking.k8s.io/v1
     kind: Gateway
     metadata:
-      name: gateway-btls-1
+      name: gateway-btls
       namespace: envoy-gateway
     spec:
       gatewayClassName: envoy-gateway-class
@@ -13,18 +13,16 @@ gateways:
           allowedRoutes:
             namespaces:
               from: All
-
-
 httpRoutes:
   - apiVersion: gateway.networking.k8s.io/v1
     kind: HTTPRoute
     metadata:
-      name: httproute-btls-1
+      name: httproute-btls
       namespace: envoy-gateway
     spec:
       parentRefs:
         - namespace: envoy-gateway
-          name: gateway-btls-1
+          name: gateway-btls
           sectionName: http
       rules:
         - matches:
@@ -32,7 +30,7 @@ httpRoutes:
                 type: Exact
                 value: "/exact"
           backendRefs:
-            - name: http-backend-1
+            - name: http-backend
               namespace: backends
               port: 8080
 
@@ -50,29 +48,18 @@ referenceGrants:
         - group: gateway.networking.k8s.io
           kind: Gateway
           namespace: envoy-gateway
-      to:
-        - group: ""
-          kind: Service
-  - apiVersion: gateway.networking.k8s.io/v1alpha2
-    kind: ReferenceGrant
-    metadata:
-      name: refg-route-gw
-      namespace: backends
-    spec:
-      from:
         - group: gateway.networking.k8s.io
-          kind: HTTPRoute
-          namespace: envoy-gateway
+          kind: BackendTLSPolicy
+          namespace: policies
       to:
         - group: ""
           kind: Service
-
 
 services:
   - apiVersion: v1
     kind: Service
     metadata:
-      name: http-backend-1
+      name: http-backend
       namespace: backends
     spec:
       clusterIP: 10.11.12.13
@@ -87,10 +74,10 @@ endpointSlices:
   - apiVersion: discovery.k8s.io/v1
     kind: EndpointSlice
     metadata:
-      name: endpointslice-http-backend-1
+      name: endpointslice-http-backend
       namespace: backends
       labels:
-        kubernetes.io/service-name: http-backend-1
+        kubernetes.io/service-name: http-backend
     addressType: IPv4
     ports:
       - name: http
@@ -102,5 +89,34 @@ endpointSlices:
         conditions:
           ready: true
 
+configMaps:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: no-ca-cmap
+      namespace: policies
+    data:
+      garbage.crt: |
+        itsAllGarbage
+
+backendTLSPolicies:
+  - apiVersion: gateway.networking.k8s.io/v1alpha2
+    kind: BackendTLSPolicy
+    metadata:
+      name: policy-btls
+      namespace: policies
+    spec:
+      targetRef:
+        group: ''
+        kind: Service
+        name: http-backend
+        namespace: backends
+        sectionName: "8080"
+      tls:
+        caCertRefs:
+          - name: no-ca-cmap
+            group: ''
+            kind: ConfigMap
+        hostname: example.com
 
 

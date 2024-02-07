@@ -8,6 +8,7 @@ package gatewayapi
 import (
 	"fmt"
 	"github.com/envoyproxy/gateway/internal/status"
+	"github.com/tetratelabs/multierror"
 	"strconv"
 	"strings"
 	"time"
@@ -183,12 +184,18 @@ func (t *Translator) processHTTPRouteRules(httpRoute *HTTPRouteContext, parentRe
 								},
 								ControllerName: gwapiv1.GatewayController(httpRoute.GatewayControllerName),
 							}
-							if err != nil {
+							if err != nil && (tlsBundle == nil || tlsBundle.CaCertificate == nil) {
 								messeg := err.Error()
 								status.SetBackendTLSPolicyCondition(policy, ancestor, gwapiv1a1.PolicyConditionAccepted, metav1.ConditionFalse, gwapiv1a1.PolicyReasonInvalid, messeg)
 								return nil
 							} else {
-								status.SetBackendTLSPolicyCondition(policy, ancestor, gwapiv1a1.PolicyConditionAccepted, metav1.ConditionTrue, gwapiv1a1.PolicyReasonAccepted, "BackendTLSPolicy is Accepted")
+								var messeg string
+								if tlsBundle.CertificateByte != nil {
+									messeg = fmt.Sprintf("BackendTLSPolicy accepted : implements mtls")
+								} else if err != nil {
+									messeg = fmt.Sprintf("BackendTLSPolicy accepted : %s", err.Error())
+								}
+								status.SetBackendTLSPolicyCondition(policy, ancestor, gwapiv1a1.PolicyConditionAccepted, metav1.ConditionTrue, gwapiv1a1.PolicyReasonAccepted, messeg)
 								return tlsBundle
 							}
 						}()
@@ -1208,7 +1215,12 @@ func GetTargetBackendReference(backendRef gwapiv1a1.BackendRef, namespace string
 			Name:      backendRef.Name,
 			Namespace: NamespacePtr(NamespaceDerefOr(backendRef.Namespace, namespace)),
 		},
-		SectionName: SectionNamePtr(strconv.Itoa(int(*backendRef.Port))),
+		SectionName: func() *gwapiv1.SectionName {
+			if backendRef.Port != nil {
+				SectionNamePtr(strconv.Itoa(int(*backendRef.Port)))
+			}
+			return nil
+		}(),
 	}
 	return ref
 }
@@ -1221,7 +1233,7 @@ func TargetMatched(policy gwapiv1a1.BackendTLSPolicy, target gwapiv1a1.PolicyTar
 		target.Kind == policyTarget.Kind &&
 		target.Name == policyTarget.Name &&
 		NamespaceDerefOr(policyTarget.Namespace, policy.Namespace) == string(*target.Namespace) {
-		if policyTarget.SectionName != nil && *policyTarget.SectionName != *target.SectionName {
+		if policyTarget.SectionName != nil && target.SectionName != nil && *policyTarget.SectionName != *target.SectionName {
 			return false
 		}
 		return true
@@ -1258,6 +1270,8 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 
 	cmapFound := false
 
+	var merror error
+
 	for _, cmap := range configmaps {
 		if kind, ok := caRefMap[cmap.Name]; ok && kind == cmap.Kind {
 			cmapFound = true
@@ -1267,8 +1281,9 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 				}
 				ca += crt
 			} else {
-				return fmt.Errorf("no ca found in configmap %s", cmap.Name), nil
+				merror = multierror.Append(merror, fmt.Errorf("no ca found in configmap %s", cmap.Name))
 			}
+
 		}
 	}
 
@@ -1279,14 +1294,19 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 					tlsBundle.CertificateByte = tls
 					tlsBundle.PrivateKeyByte = key
 				} else {
-					return fmt.Errorf("no tls key found in secret %s", secret.Name), nil
+					merror = multierror.Append(merror, fmt.Errorf("no tls key found in secret %s", secret.Name))
+					//return fmt.Errorf("no tls key found in secret %s", secret.Name), nil
 				}
+			} else if _, keyOk := secret.Data["tls.key"]; keyOk {
+				merror = multierror.Append(merror, fmt.Errorf("no tls cert found in secret %s", secret.Name))
+			} else {
+				merror = multierror.Append(merror, fmt.Errorf("no tls cert or key found in secret %s", secret.Name))
 			}
 		}
 	}
 
 	if !cmapFound {
-		return fmt.Errorf("no refered configmap found"), nil
+		return fmt.Errorf("no referred configmap found"), nil
 	}
 	if ca == "" {
 		return fmt.Errorf("no ca found in referred configmaps"), nil
@@ -1298,5 +1318,5 @@ func getBackendTLSBundle(policies []*gwapiv1a1.BackendTLSPolicy, configmaps []*c
 
 	tlsBundle.Hostname = string(backendTLSPolicy.Spec.TLS.Hostname)
 
-	return nil, tlsBundle
+	return merror, tlsBundle
 }

@@ -179,6 +179,7 @@ services:
     clusterIP: 10.11.12.14
     ports:
       - port: 8080
+        name: http
         protocol: TCP
         targetPort: 8080
 
@@ -191,6 +192,7 @@ services:
     clusterIP: 10.11.12.15
     ports:
       - port: 8080
+        name: http
         protocol: TCP
         targetPort: 8080
 
