@@ -61,19 +61,19 @@ gateways:
         conditions:
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Sending translated listener configuration to the data plane
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Programmed
             status: "True"
             type: Programmed
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Listener has been successfully translated
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Accepted
             status: "True"
             type: Accepted
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Listener references have been resolved
-            observedGeneration: 1
+            observedGeneration: 0
             reason: ResolvedRefs
             status: "True"
             type: ResolvedRefs
@@ -103,19 +103,19 @@ gateways:
         conditions:
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Sending translated listener configuration to the data plane
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Programmed
             status: "True"
             type: Programmed
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Listener has been successfully translated
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Accepted
             status: "True"
             type: Accepted
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Listener references have been resolved
-            observedGeneration: 1
+            observedGeneration: 0
             reason: ResolvedRefs
             status: "True"
             type: ResolvedRefs
@@ -131,45 +131,34 @@ httpRoutes:
   kind: HTTPRoute
   metadata:
     name: httproute-btls-1
-    namespace: routes
+    namespace: envoy-gateway
   spec:
     parentRefs:
-      - group: gateway.networking.k8s.io
-        kind: Gateway
-        name: gateway-btls-1
+      - name: gateway-btls-1
         namespace: envoy-gateway
         sectionName: http
     rules:
       - backendRefs:
-          - group: ""
-            kind: Service
-            name: http-backend-1
+          - name: http-backend-1
             namespace: backends
             port: 8080
-            weight: 1
-        matches:
-          - path:
-              type: PathPrefix
-              value: /
   status:
     parents:
       - conditions:
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Route is accepted
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Accepted
             status: "True"
             type: Accepted
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Resolved all the Object references for the Route
-            observedGeneration: 1
+            observedGeneration: 0
             reason: ResolvedRefs
             status: "True"
             type: ResolvedRefs
         controllerName: gateway.envoyproxy.io/gatewayclass-controller
         parentRef:
-          group: gateway.networking.k8s.io
-          kind: Gateway
           name: gateway-btls-1
           namespace: envoy-gateway
           sectionName: http
@@ -177,45 +166,34 @@ httpRoutes:
   kind: HTTPRoute
   metadata:
     name: httproute-btls-2
-    namespace: routes
+    namespace: envoy-gateway
   spec:
     parentRefs:
-      - group: gateway.networking.k8s.io
-        kind: Gateway
-        name: gateway-btls-2
+      - name: gateway-btls-2
         namespace: envoy-gateway
         sectionName: http
     rules:
       - backendRefs:
-          - group: ""
-            kind: Service
-            name: http-backend-2
+          - name: http-backend-2
             namespace: backends
             port: 8080
-            weight: 1
-        matches:
-          - path:
-              type: PathPrefix
-              value: /
   status:
     parents:
       - conditions:
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Route is accepted
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Accepted
             status: "True"
             type: Accepted
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Resolved all the Object references for the Route
-            observedGeneration: 1
+            observedGeneration: 0
             reason: ResolvedRefs
             status: "True"
             type: ResolvedRefs
         controllerName: gateway.envoyproxy.io/gatewayclass-controller
         parentRef:
-          group: gateway.networking.k8s.io
-          kind: Gateway
           name: gateway-btls-2
           namespace: envoy-gateway
           sectionName: http
@@ -223,45 +201,34 @@ httpRoutes:
   kind: HTTPRoute
   metadata:
     name: httproute-btls-3
-    namespace: routes
+    namespace: envoy-gateway
   spec:
     parentRefs:
-      - group: gateway.networking.k8s.io
-        kind: Gateway
-        name: gateway-btls-3
+      - name: gateway-btls-3
         namespace: envoy-gateway
         sectionName: http
     rules:
       - backendRefs:
-          - group: ""
-            kind: Service
-            name: http-backend-3
+          - name: http-backend-3
             namespace: backends
             port: 8080
-            weight: 1
-        matches:
-          - path:
-              type: PathPrefix
-              value: /
   status:
     parents:
       - conditions:
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Route is accepted
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Accepted
             status: "True"
             type: Accepted
           - lastTransitionTime: "2024-02-05T09:28:37Z"
             message: Resolved all the Object references for the Route
-            observedGeneration: 1
+            observedGeneration: 0
             reason: ResolvedRefs
             status: "True"
             type: ResolvedRefs
         controllerName: gateway.envoyproxy.io/gatewayclass-controller
         parentRef:
-          group: gateway.networking.k8s.io
-          kind: Gateway
           name: gateway-btls-3
           namespace: envoy-gateway
           sectionName: http
@@ -291,15 +258,13 @@ backendTLSPolicies:
   status:
     ancestors:
       - ancestorRef:
-          group: gateway.networking.k8s.io
-          kind: Gateway
           name: gateway-btls-1
           namespace: envoy-gateway
           sectionName: http
         conditions:
           - lastTransitionTime: "2024-02-05T09:31:24Z"
             message: BackendTLSPolicy is Accepted
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Accepted
             status: "True"
             type: Accepted
@@ -325,15 +290,13 @@ backendTLSPolicies:
   status:
     ancestors:
       - ancestorRef:
-          group: gateway.networking.k8s.io
-          kind: Gateway
           name: gateway-btls-2
           namespace: envoy-gateway
           sectionName: http
         conditions:
           - lastTransitionTime: "2024-02-05T09:31:24Z"
             message: no refered configmap found
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Invalid
             status: "False"
             type: Accepted
@@ -359,15 +322,13 @@ backendTLSPolicies:
   status:
     ancestors:
       - ancestorRef:
-          group: gateway.networking.k8s.io
-          kind: Gateway
           name: gateway-btls-3
           namespace: envoy-gateway
           sectionName: http
         conditions:
           - lastTransitionTime: "2024-02-05T09:31:24Z"
             message: BackendTLSPolicy is Accepted
-            observedGeneration: 1
+            observedGeneration: 0
             reason: Accepted
             status: "True"
             type: Accepted
@@ -396,7 +357,7 @@ xdsIR:
               invalid: 0
               valid: 0
             destination:
-              name: httproute/routes/httproute-btls-1/rule/0
+              name: httproute/envoy-gateway/httproute-btls-1/rule/0
               settings:
                 - endpoints:
                     - host: 10.244.0.10
@@ -404,7 +365,7 @@ xdsIR:
                   protocol: HTTP
                   weight: 1
             hostname: '*'
-            name: httproute/routes/httproute-btls-1/rule/0/match/0/*
+            name: httproute/envoy-gateway/httproute-btls-1/rule/0/match/-1/*
             pathMatch:
               distinct: false
               name: ""
@@ -425,7 +386,7 @@ xdsIR:
               invalid: 0
               valid: 0
             destination:
-              name: httproute/routes/httproute-btls-2/rule/0
+              name: httproute/envoy-gateway/httproute-btls-2/rule/0
               settings:
                 - endpoints:
                     - host: 10.244.0.11
@@ -433,7 +394,7 @@ xdsIR:
                   protocol: HTTP
                   weight: 1
             hostname: '*'
-            name: httproute/routes/httproute-btls-2/rule/0/match/0/*
+            name: httproute/envoy-gateway/httproute-btls-2/rule/0/match/-1/*
             pathMatch:
               distinct: false
               name: ""
@@ -460,7 +421,7 @@ xdsIR:
               invalid: 0
               valid: 0
             destination:
-              name: httproute/routes/httproute-btls-3/rule/0
+              name: httproute/envoy-gateway/httproute-btls-3/rule/0
               settings:
                 - endpoints:
                     - host: 10.244.0.12
@@ -468,7 +429,7 @@ xdsIR:
                   protocol: HTTP
                   weight: 1
             hostname: '*'
-            name: httproute/routes/httproute-btls-3/rule/0/match/0/*
+            name: httproute/envoy-gateway/httproute-btls-3/rule/0/match/-1/*
             pathMatch:
               distinct: false
               name: ""

@@ -53,7 +53,7 @@ referenceGrants:
     from:
       - group: gateway.networking.k8s.io
         kind: HTTPRoute
-        namespace: routes
+        namespace: envoy-gateway
     to:
       - group: ""
         kind: Service
@@ -75,7 +75,7 @@ referenceGrants:
   kind: ReferenceGrant
   metadata:
     name: refg-gway-route
-    namespace: routes
+    namespace: envoy-gateway
   spec:
     from:
       - group: gateway.networking.k8s.io
@@ -252,7 +252,7 @@ httpRoutes:
   kind: HTTPRoute
   metadata:
     name: httproute-btls-1
-    namespace: routes
+    namespace: envoy-gateway
   spec:
     parentRefs:
       - namespace: envoy-gateway
@@ -267,7 +267,7 @@ httpRoutes:
   kind: HTTPRoute
   metadata:
     name: httproute-btls-2
-    namespace: routes
+    namespace: envoy-gateway
   spec:
     parentRefs:
       - namespace: envoy-gateway
@@ -282,7 +282,7 @@ httpRoutes:
   kind: HTTPRoute
   metadata:
     name: httproute-btls-3
-    namespace: routes
+    namespace: envoy-gateway
   spec:
     parentRefs:
       - namespace: envoy-gateway
