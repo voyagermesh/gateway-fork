@@ -515,12 +515,6 @@ func processXdsCluster(tCtx *types.ResourceVersionTable, httpRoute *ir.HTTPRoute
 	tsocket = nil
 
 	if httpRoute.BackendTLS != nil {
-		if httpRoute.BackendTLS.Mtls() {
-			tlsSecret := buildXdsTLSCertSecret(*httpRoute.BackendTLS.TLSCert) //buildXdsUpstreamTLSCertSecret(*httpRoute.BackendTLS)
-			if err := tCtx.AddXdsResource(resourcev3.SecretType, tlsSecret); err != nil {
-				return err
-			}
-		}
 		CaSecret := buildXdsUpstreamTLSCASecret(*httpRoute.BackendTLS)
 		if err := tCtx.AddXdsResource(resourcev3.SecretType, CaSecret); err != nil {
 			return err
@@ -607,29 +601,10 @@ const (
 	EDS
 )
 
-//func buildXdsUpstreamTLSCertSecret(tlsConfig ir.TLSBundle) *tlsv3.Secret {
-//	// Build the tls secret
-//
-//	return &tlsv3.Secret{
-//		Name: tlsConfig.GetXdsCertSecretName(), // GetBackendTLSCertSecretName(tlsConfig),
-//		Type: &tlsv3.Secret_TlsCertificate{
-//			TlsCertificate: &tlsv3.TlsCertificate{
-//				CertificateChain: &corev3.DataSource{
-//					Specifier: &corev3.DataSource_InlineBytes{InlineBytes: tlsConfig.CertificateByte},
-//				},
-//				PrivateKey: &corev3.DataSource{
-//					Specifier: &corev3.DataSource_InlineBytes{InlineBytes: tlsConfig.PrivateKeyByte},
-//				},
-//			},
-//		},
-//	}
-//}
-
 func buildXdsUpstreamTLSCASecret(tlsConfig ir.TLSBundle) *tlsv3.Secret {
 	// Build the tls secret
-
 	return &tlsv3.Secret{
-		Name: tlsConfig.CACert.Name, // tlsConfig.GetXdsCaSecretName(), // GetBackendTLSCaSecretName(tlsConfig),
+		Name: tlsConfig.CACert.Name,
 		Type: &tlsv3.Secret_ValidationContext{
 			ValidationContext: &tlsv3.CertificateValidationContext{
 				TrustedCa: &corev3.DataSource{
@@ -644,18 +619,7 @@ func buildXdsUpstreamTLSSocketWthCert(tlsConfigs *ir.TLSBundle) (*corev3.Transpo
 
 	tlsCtx := &tlsv3.UpstreamTlsContext{
 		CommonTlsContext: &tlsv3.CommonTlsContext{
-			TlsCertificateSdsSecretConfigs: func() []*tlsv3.SdsSecretConfig {
-				if !tlsConfigs.Mtls() {
-					return nil
-				}
-				x := []*tlsv3.SdsSecretConfig{
-					{
-						Name:      tlsConfigs.TLSCert.Name, //tlsConfigs.GetXdsCertSecretName(),
-						SdsConfig: makeConfigSource(),
-					},
-				}
-				return x
-			}(),
+			TlsCertificateSdsSecretConfigs: nil,
 			ValidationContextType: &tlsv3.CommonTlsContext_ValidationContextSdsSecretConfig{
 				ValidationContextSdsSecretConfig: &tlsv3.SdsSecretConfig{
 					Name:      tlsConfigs.CACert.Name, //tlsConfigs.GetXdsCaSecretName(),
@@ -664,7 +628,7 @@ func buildXdsUpstreamTLSSocketWthCert(tlsConfigs *ir.TLSBundle) (*corev3.Transpo
 			},
 		},
 		Sni:                tlsConfigs.Hostname,
-		AllowRenegotiation: tlsConfigs.Mtls(),
+		AllowRenegotiation: false,
 	}
 
 	tlsCtxAny, err := anypb.New(tlsCtx)
@@ -673,7 +637,7 @@ func buildXdsUpstreamTLSSocketWthCert(tlsConfigs *ir.TLSBundle) (*corev3.Transpo
 	}
 
 	return &corev3.TransportSocket{
-		Name: wellknown.TransportSocketTLS, // "envoy.transport_sockets.starttls",
+		Name: wellknown.TransportSocketTLS,
 		ConfigType: &corev3.TransportSocket_TypedConfig{
 			TypedConfig: tlsCtxAny,
 		},
