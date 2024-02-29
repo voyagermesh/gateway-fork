@@ -450,8 +450,6 @@ type HTTPRoute struct {
 	Timeout *Timeout `json:"timeout,omitempty" yaml:"timeout,omitempty"`
 	// TcpKeepalive settings associated with the upstream client connection.
 	TCPKeepalive *TCPKeepalive `json:"tcpKeepalive,omitempty" yaml:"tcpKeepalive,omitempty"`
-
-	BackendTLS *TLSBundle `json:"backendTLS,omitempty" yaml:"backendTLS,omitempty"`
 }
 
 // UnstructuredRef holds unstructured data for an arbitrary k8s resource introduced by an extension
@@ -799,6 +797,8 @@ type DestinationSetting struct {
 	Endpoints []*DestinationEndpoint `json:"endpoints,omitempty" yaml:"endpoints,omitempty"`
 	// AddressTypeState specifies the state of DestinationEndpoint address type.
 	AddressType *DestinationAddressType `json:"addressType,omitempty" yaml:"addressType,omitempty"`
+
+	BackendTLS *TLSUpstreamConfig `json:"backendTLS,omitempty" yaml:"backendTLS,omitempty"`
 }
 
 // Validate the fields within the RouteDestination structure
@@ -1653,9 +1653,9 @@ type HTTPTimeout struct {
 	MaxConnectionDuration *metav1.Duration `json:"maxConnectionDuration,omitempty" yaml:"maxConnectionDuration,omitempty"`
 }
 
-// TLSBundle contains hostname and ca file in []byte format.
+// TLSUpstreamConfig contains sni and ca file in []byte format.
 // +k8s:deepcopy-gen=true
-type TLSBundle struct {
-	Hostname string
-	CACert   TLSCACertificate
+type TLSUpstreamConfig struct {
+	SNI           string
+	CACertificate TLSCACertificate
 }
