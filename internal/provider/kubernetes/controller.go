@@ -306,6 +306,23 @@ func (r *gatewayAPIReconciler) Reconcile(ctx context.Context, _ reconcile.Reques
 		// Add the referenced Secrets in SecurityPolicies to the resourceTree
 		r.processSecurityPolicySecretRefs(ctx, resourcesMap[acceptedGC.Name], resourceMappings)
 
+		// Add all BackendTLSPolies
+		backendTLSPolicies := gwapiv1a2.BackendTLSPolicyList{}
+		if err := r.client.List(ctx, &backendTLSPolicies); err != nil {
+			return reconcile.Result{}, fmt.Errorf("error listing BackendTLSPolicies: %w", err)
+		}
+
+		for _, policy := range backendTLSPolicies.Items {
+			policy := policy
+			// Discard Status to reduce memory consumption in watchable
+			// It will be recomputed by the gateway-api layer
+			policy.Status = gwapiv1a2.PolicyStatus{} // todo ?
+			resourcesMap[acceptedGC.Name].BackendTLSPolicies = append(resourcesMap[acceptedGC.Name].BackendTLSPolicies, &policy)
+		}
+
+		// Add the referenced Secrets and ConfigMaps in BackendTLSPolicies to the resourceTree
+		r.processBackendTLSPolicyConfigMapRefs(ctx, resourcesMap[acceptedGC.Name], resourceMappings)
+
 		// For this particular Gateway, and all associated objects, check whether the
 		// namespace exists. Add to the resourceTree.
 		for ns := range resourceMappings.allAssociatedNamespaces {
@@ -931,7 +948,7 @@ func (r *gatewayAPIReconciler) watchResources(ctx context.Context, mgr manager.M
 		return err
 	}
 
-	// Watch ConfigMap CRUDs and process affected ClienTraffiPolicies.
+	// Watch ConfigMap CRUDs and process affected ClienTraffiPolicies and BackendTLSPolicies.
 	configMapPredicates := []predicate.Predicate{
 		predicate.GenerationChangedPredicate{},
 		predicate.NewPredicateFuncs(r.validateConfigMapForReconcile),
@@ -1038,6 +1055,24 @@ func (r *gatewayAPIReconciler) watchResources(ctx context.Context, mgr manager.M
 		return err
 	}
 	if err := addSecurityPolicyIndexers(ctx, mgr); err != nil {
+		return err
+	}
+
+	// Watch BackendTLSPolicy
+	btlsPredicates := []predicate.Predicate{predicate.GenerationChangedPredicate{}}
+	if r.namespaceLabel != nil {
+		btlsPredicates = append(btlsPredicates, predicate.NewPredicateFuncs(r.hasMatchingNamespaceLabels))
+	}
+
+	if err := c.Watch(
+		source.Kind(mgr.GetCache(), &gwapiv1a2.BackendTLSPolicy{}),
+		handler.EnqueueRequestsFromMapFunc(r.enqueueClass),
+		btlsPredicates...,
+	); err != nil {
+		return err
+	}
+
+	if err := addBtlsIndexers(ctx, mgr); err != nil {
 		return err
 	}
 
@@ -1169,4 +1204,41 @@ func (r *gatewayAPIReconciler) serviceImportCRDExists(mgr manager.Manager) bool 
 	}
 
 	return serviceImportFound
+}
+
+func (r *gatewayAPIReconciler) processBackendTLSPolicyConfigMapRefs(ctx context.Context, resourceTree *gatewayapi.Resources, resourceMap *resourceMappings) {
+	for _, policy := range resourceTree.BackendTLSPolicies {
+		tls := policy.Spec.TLS
+
+		if tls.CACertRefs != nil {
+			for _, caCertRef := range tls.CACertRefs {
+				if string(caCertRef.Kind) == gatewayapi.KindConfigMap {
+					caRefNew := gwapiv1b1.SecretObjectReference{
+						Group:     gatewayapi.GroupPtr(string(caCertRef.Group)),
+						Kind:      gatewayapi.KindPtr(string(caCertRef.Kind)),
+						Name:      caCertRef.Name,
+						Namespace: gatewayapi.NamespacePtr(policy.Namespace),
+					}
+					if err := r.processConfigMapRef(
+						ctx,
+						resourceMap,
+						resourceTree,
+						gatewayapi.KindBackendTLSPolicy,
+						policy.Namespace,
+						policy.Name,
+						caRefNew); err != nil {
+						// we don't return an error here, because we want to continue
+						// reconciling the rest of the ClientTrafficPolicies despite that this
+						// reference is invalid.
+						// This ClientTrafficPolicy will be marked as invalid in its status
+						// when translating to IR because the referenced configmap can't be
+						// found.
+						r.log.Error(err,
+							"failed to process CACertificateRef for BackendTLSPolicy",
+							"policy", policy, "caCertificateRef", caCertRef.Name)
+					}
+				}
+			}
+		}
+	}
 }
