@@ -303,8 +303,8 @@ func (in *DestinationSetting) DeepCopyInto(out *DestinationSetting) {
 		*out = new(DestinationAddressType)
 		**out = **in
 	}
-	if in.BackendTLS != nil {
-		in, out := &in.BackendTLS, &out.BackendTLS
+	if in.TLS != nil {
+		in, out := &in.TLS, &out.TLS
 		*out = new(TLSUpstreamConfig)
 		(*in).DeepCopyInto(*out)
 	}

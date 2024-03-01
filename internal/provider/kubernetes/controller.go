@@ -315,12 +315,12 @@ func (r *gatewayAPIReconciler) Reconcile(ctx context.Context, _ reconcile.Reques
 	r.processSecurityPolicySecretRefs(ctx, resourceTree, resourceMap)
 
 	// Add all BackendTLSPolies
-	backendTlsPolicies := gwapiv1a2.BackendTLSPolicyList{}
-	if err := r.client.List(ctx, &backendTlsPolicies); err != nil {
-		return reconcile.Result{}, fmt.Errorf("error listing BackendTLSPolicies: %v", err)
+	backendTLSPolicies := gwapiv1a2.BackendTLSPolicyList{}
+	if err := r.client.List(ctx, &backendTLSPolicies); err != nil {
+		return reconcile.Result{}, fmt.Errorf("error listing BackendTLSPolicies: %w", err)
 	}
 
-	for _, policy := range backendTlsPolicies.Items {
+	for _, policy := range backendTLSPolicies.Items {
 		policy := policy
 		// Discard Status to reduce memory consumption in watchable
 		// It will be recomputed by the gateway-api layer
@@ -639,20 +639,6 @@ func (r *gatewayAPIReconciler) findReferenceGrant(ctx context.Context, from, to 
 	}
 
 	// No ReferenceGrant found.
-	return nil, nil
-}
-
-func (r *gatewayAPIReconciler) findBackendTLSPolicy(ctx context.Context, targetBackend gwapiv1a2.PolicyTargetReferenceWithSectionName) (*gwapiv1a2.BackendTLSPolicy, error) {
-	backendTLSPolicyList := new(gwapiv1a2.BackendTLSPolicyList)
-	if err := r.client.List(ctx, backendTLSPolicyList); err != nil {
-		return nil, fmt.Errorf("failed to list backendTLSPolicies: %v", err)
-	}
-
-	for _, bacTLS := range backendTLSPolicyList.Items {
-		if gatewayapi.TargetMatched(bacTLS, targetBackend) {
-			return &bacTLS, nil
-		}
-	}
 	return nil, nil
 }
 

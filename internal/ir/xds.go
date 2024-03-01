@@ -12,14 +12,15 @@ import (
 	"net/netip"
 	"reflect"
 
-	egv1a1 "github.com/envoyproxy/gateway/api/v1alpha1"
-	egv1a1validation "github.com/envoyproxy/gateway/api/v1alpha1/validation"
 	"golang.org/x/exp/slices"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"sigs.k8s.io/yaml"
+
+	egv1a1 "github.com/envoyproxy/gateway/api/v1alpha1"
+	egv1a1validation "github.com/envoyproxy/gateway/api/v1alpha1/validation"
 )
 
 var (
@@ -798,7 +799,7 @@ type DestinationSetting struct {
 	// AddressTypeState specifies the state of DestinationEndpoint address type.
 	AddressType *DestinationAddressType `json:"addressType,omitempty" yaml:"addressType,omitempty"`
 
-	BackendTLS *TLSUpstreamConfig `json:"backendTLS,omitempty" yaml:"backendTLS,omitempty"`
+	TLS *TLSUpstreamConfig `json:"tls,omitempty" yaml:"tls,omitempty"`
 }
 
 // Validate the fields within the RouteDestination structure
