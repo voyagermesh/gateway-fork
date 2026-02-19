@@ -72,7 +72,7 @@ require (
 require (
 	cel.dev/expr v0.16.0 // indirect
 	dario.cat/mergo v1.0.1 // indirect
-	filippo.io/edwards25519 v1.1.0 // indirect
+	filippo.io/edwards25519 v1.1.1 // indirect
 	fortio.org/cli v1.9.2 // indirect
 	fortio.org/dflag v1.7.3 // indirect
 	fortio.org/safecast v1.0.0 // indirect
