@@ -33,7 +33,7 @@ require (
 	github.com/containerd/typeurl/v2 v2.2.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/docker/cli v27.3.1+incompatible // indirect
+	github.com/docker/cli v29.2.0+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
 	github.com/docker/docker v27.3.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.2 // indirect
