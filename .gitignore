@@ -9,7 +9,6 @@ docs/html
 .run/
 
 # Visual Studio Code
-.vscode/
 
 # Release artifacts
 release-artifacts/
@@ -42,3 +41,6 @@ charts/gateway-addons-helm/dashboards/vendor/
 .*.swp
 
 *.tar.gz
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
