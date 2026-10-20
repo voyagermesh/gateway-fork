@@ -1,6 +1,6 @@
 module github.com/envoyproxy/gateway
 
-go 1.23.1
+go 1.24
 
 replace github.com/imdario/mergo => github.com/imdario/mergo v0.3.16
 
@@ -137,7 +137,7 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.7.1 // indirect
 	github.com/jmoiron/sqlx v1.4.0 // indirect
-	github.com/klauspost/compress v1.17.9 // indirect
+	github.com/klauspost/compress v1.18.7 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/kortschak/goroutine v1.1.2 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
